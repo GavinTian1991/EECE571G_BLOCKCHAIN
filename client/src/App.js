@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import getWeb3 from "./getWeb3";
-import Can from './Can';
-import CustomDate from './CustomDate';
-import VoteContract from "./contracts/Vote.json";
-import canRawData from "./data/candidates.json";
+import Web3 from 'web3';
+// import Can from './Can';
+// import CustomDate from './CustomDate';
+// import VoteContract from "./contracts/Vote.json";
+// import canRawData from "./data/candidates.json";
 import "./App.css";
 
 
@@ -11,82 +11,59 @@ import "./App.css";
 class App extends Component {
   constructor(props) {
     super(props);
-    //read candidate image and information from Json file
-    const requireContext = require.context("./data/images",true, /^\.\/.*\.jpg$/);
-    const canImages = requireContext.keys().map(requireContext);
 
     this.state = { 
-      web3: null, 
-      accounts: null, 
-      voteContract: null, 
+      account: '', // the account here is the account in metamask, so this is why we should reload the page after add an account
+      totalNumber: 0,
       candidates: [],
-      canStateImages: null, 
-      canStateData: null 
+      loading: true
     }
 
-    this.state = { canStateImages: canImages, canStateData: canRawData, candidates: [] };
+    this.getWeb3Provider = this.getWeb3Provider.bind(this);
+    this.connectToBlockchain = this.connectToBlockchain.bind(this);
   }
-
-  componentDidMount = async () => {
-    try {
-      // Get network provider and web3 instance.
-      const web3 = await getWeb3(); 
-
-      // Use web3 to get the user's accounts.
-      const accounts = await web3.eth.getAccounts();
-
-      // Get the contract instance.
-      const networkId = await web3.eth.net.getId();
-      const deployedNetwork = VoteContract.networks[networkId];
-      const voteContractInstance = new web3.eth.Contract(VoteContract.abi, deployedNetwork.address);
-
-      // Set web3, accounts, and contract to the state
-      this.setState({ web3, accounts, voteContract: voteContractInstance });
-
-      const voteName = await voteContractInstance.methods.voteName().call();
-      console.log(voteName);
-
-      const candidatesCount = await voteContractInstance.methods.candidatesCount().call();
-      console.log(candidatesCount);
-
-
-      //If there is no candidate data in blockchain, read from Json
-      if(candidatesCount == 0){
-          const promises = this.state.canStateData.map(async data => {
-            const canTmp = await voteContractInstance.methods.createCandidate(data.name, 
-              data.age, data.party).send({from: accounts[0]});
-            return canTmp
-          })
-          await Promise.all(promises)
-      }
-
-      //copy candiddates info. from blockchain to local
-      for (let j = 1; j <= candidatesCount; j++) {
-        const candidate = await voteContractInstance.methods.candidates(j).call();
-        const candidates = this.state.candidates;
-        candidates.push({
-          id: candidate[0],
-          name: candidate[1],
-          age: candidate[2],
-          party: candidate[3],
-          voteCount: candidate[4]
-        });
-        this.setState({ candidates: candidates })
-      }
-
-      console.log(this.state.candidates);
-
-    } catch (error) {
-      // Catch any errors for any of the above operations.
-      alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`,
-      );
-      console.error(error);
+  async componentDidMount(){
+    await this.getWeb3Provider();
+    await this.connectToBlockchain();
+  }
+  
+  async getWeb3Provider(){
+    if (window.ethereum) {
+      window.web3 = new Web3(window.ethereum);
+      await window.ethereum.enable();
     }
-  };
-
-  voteForCandidate = async (_candidateId) => {
-    await this.state.voteContract.methods.vote(_candidateId).send({from: this.state.accounts[0]})
+    else if (window.web3) {
+      window.web3 = new Web3(window.web3.currentProvider); // try to connect metamask
+    }
+    else {
+        window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!');
+    }
+  }
+ // get the item info so we can use it to render the table
+  async connectToBlockchain(){
+    const web3 = window.web3;
+    const accounts = await web3.eth.getAccounts();
+    this.setState({account: accounts[0]})
+    const networkId = await web3.eth.net.getId() // get network id from metamask
+    const networkData = Ethbay.networks[networkId]; // try use access network id  to access data from ethbay doc
+    if(networkData) {
+      const deployedEthbay = new web3.eth.Contract(Ethbay.abi, networkData.address); // access the contract, address is the contract address, abi work as a bridge
+      this.setState({deployedEthbay: deployedEthbay}); // add the contract to state
+      const totalNumber = await deployedEthbay.methods.totalNumber().call(); // call a default function in the contract, cuz totalNUmber is public, so has a getter in default
+      console.log(totalNumber);
+      this.setState({totalNumber}) // equal to this.setState({totalNumber:totalNumber}), since key:value name is the same
+      for (var i = 1;i<= totalNumber;i++) {
+        const item = await deployedEthbay.methods.items(i).call(); // get each items info, item is a mapping(addr => Item)
+        this.setState({
+          items:[...this.state.items, item] // append the item into the existing item array
+        });
+      }
+      this.setState({loading: false})
+      console.log(this.state.items)
+    } else {
+      window.alert('Ethbay contract is not found in your blockchain.')
+    }
+  
   }
 
   render() {
