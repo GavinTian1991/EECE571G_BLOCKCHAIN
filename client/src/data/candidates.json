@@ -1,0 +1,34 @@
+[
+    {
+    "id": 0,
+    "name": "Donald Trump",
+    "age": 73,
+    "party": "Republican",
+    "location": "Queens, New York City",
+    "link": "https://en.wikipedia.org/wiki/Donald_Trump"
+    },
+    {
+    "id": 1,
+    "name": "Bill Clinton",
+    "age": 75,
+    "party": "Democratic",
+    "location": "Hope, Arkansas",
+    "link": "https://en.wikipedia.org/wiki/Bill_Clinton"
+    },
+    {
+    "id": 2,
+    "name": "Barack Obama",
+    "age": 80,
+    "party": "Democratic",
+    "location": "Honolulu, Hawaii",
+    "link": "https://en.wikipedia.org/wiki/Barack_Obama"
+    },
+    {
+    "id": 3,
+    "name": "John F. Kennedy",
+    "age": 82,
+    "party": "Democratic",
+    "location": "Brookline, MA",
+    "link": "https://en.wikipedia.org/wiki/John_F._Kennedy"
+    }
+]
