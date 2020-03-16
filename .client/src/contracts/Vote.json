@@ -28906,13 +28906,12 @@
         }
       },
       "links": {},
-      "address": "0xCf0A66786C7A60217758b81ed19e084FE4894392",
-      "transactionHash": "0xd8bedeea157b1d349e691b390c17152db2641f25b99fd18df2e4c2082cf1e6bf"
+      "address": "0x17D5D30f764d3D044378577F2F89005076196De4",
+      "transactionHash": "0xb3369bcc9769e43847344fccd6a075e65a4daafe0ee49fb30969f11ced58a379"
     }
   },
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-03-16T00:33:54.132Z",
-  "networkType": "ethereum",
+  "updatedAt": "2020-03-16T00:30:05.303Z",
   "devdoc": {
     "methods": {}
   },

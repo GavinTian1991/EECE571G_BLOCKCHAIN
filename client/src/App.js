@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import Web3 from 'web3';
-import VoteContract from "./contracts/Vote.json";
+import VoteContract from "./contracts/Vote";
 import Addressbar from './Addressbar';
-import Main from './Main';
+import {Navbar,Nav} from 'react-bootstrap';
+import {Link,BrowserRouter as Router,Switch,Route} from 'react-router-dom';
+import CreateNewCandidate from './CreateNewCandidate.js';
 import "./App.css";
 
 
@@ -53,58 +55,93 @@ class App extends Component {
     const accounts = await web3.eth.getAccounts();
     this.setState({account: accounts[0]})
     const networkId = await web3.eth.net.getId() // get network id from metamask
-    const networkData = Ethbay.networks[networkId]; // try use access network id  to access data from ethbay doc
+    const networkData = VoteContract.networks[networkId]; // try use access network id  to access data from ethbay doc
     if(networkData) {
       const deployedVoteContract = new web3.eth.Contract(VoteContract.abi, networkData.address); // access the contract, address is the contract address, abi work as a bridge
       this.setState({deployedVoteContract: deployedVoteContract}); // add the contract to state
-      
+      this.setState({loading: false})
     } else {
       window.alert('Ethbay contract is not found in your blockchain.')
     }
   
   }
 
-  async changeMyvote(){}
-  async createNewCandidate(){}
-  async deployShareHold(){}
-  async lookUpVoteRecord(){}
-  async voteForCandidate(){}
+  async changeMyvote(candidateId,newVote,voteInfoNum){
+    this.setState ({loading: true})
+   this.state.deployedVoteContract.methods.changeMyvote(candidateId,newVote,voteInfoNum,309).send({from: this.state.account})
+    .once('receipt', (receipt)=> {
+      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
+    })
+  }
+  async createNewCandidate(name,photoURL,candidateInfo){
+    this.setState ({loading: true})
+    alert("setState candidate information submit!");
+    this.state.deployedVoteContract.methods.createNewCandidate(name,photoURL,candidateInfo,109).send({from: this.state.account})
+    .once('receipt', (receipt)=> {
+      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
+    })
+  }
+  async deployShareHold(address,shareHold){
+    this.setState ({loading: true})
+    this.state.deployedVoteContract.methods.deployShareHold(address,shareHold).send({from: this.state.account})
+    .once('receipt', (receipt)=> {
+      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
+    })
+  }
+  async lookUpVoteRecord(recordId){
+    this.setState ({loading: true})
+    // will emit event containing the vote record Info
+    this.state.deployedVoteContract.methods.lookUpVoteRecord(recordId).send({from: this.state.account})
+    .once('receipt', (receipt)=> {
+      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
+    })
+  }
+  async voteForCandidate(candidateId,voteNum){
+    this.setState ({loading: true})
+    this.state.deployedVoteContract.methods.voteForCandidate(candidateId,voteNum,309).send({from: this.state.account})
+    .once('receipt', (receipt)=> {
+      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
+    })
+  }
 
  
   
   render() {
     return (
       <Router>
-        <Navbar bg="light">
+        <Navbar bg="dark" variant="dark">
 				<Link to={""} className="navbar-brand">My D-Vote</Link>
 				
 				<Nav className="mr-auto">
-			      <Link to={{pathname:"/",state=this.state}} className="nav-link">Create New Candidate</Link>
-			      <Link to={{pathname:"deployShareHold",state=this.state}} className="nav-link">Deploy ShareHold</Link>
-                  <Link to={{pathname:"lookUpVoteRecord",state=this.state}} className="nav-link">Look Up My Vote Record</Link>
-                  <Link to={{pathname:"voteForCandidate",state=this.state}} className="nav-link">Vote For Candidate</Link>
+			      <Link to={{pathname:"/",createNewCandidate:this.createNewCandidate}} className="nav-link">Create New Candidate</Link>
+			      <Link to={{pathname:"deployShareHold"}} className="nav-link">Deploy ShareHold</Link>
+                  <Link to={{pathname:"lookUpVoteRecord"}} className="nav-link">Look Up My Vote Record</Link>
+                  <Link to={{pathname:"voteForCandidate"}} className="nav-link">Vote For Candidate</Link>
                   
 			    </Nav>
 				</Navbar>
       <div>
-        <Addressbar account={this.state.account}/>
-        <div className="container-fluid mt-5">
-          <div className="row">
-            <main>
+        <div>
+          <h1>Welcome</h1>
+        {"Your Address: " + this.state.account}
+        
+        </div>
+        
+          
+            
               { this.state.loading 
                 ? 
                   <div><p className="text-center">Loading ...</p></div> 
                 : 
                 <Switch>
-                <Route path="/" exact component={CreateNewCandidate}/>
-                <Route path="/deployShareHold" exact component={DeployShareHold}/>
-                <Route path="/lookUpVoteRecord" exact component={LookUpVoteRecord}/>
-                <Route path="/voteForCandidate" exact component={VoteForCandidate}/>
+                  <Route path="/">
+                    <CreateNewCandidate createNewCandidate={this.createNewCandidate}/>
+                  </Route>
                 </Switch>
                   }
-            </main>
-          </div>
-        </div>
+            
+          
+        
       </div>
       </Router>
     );
