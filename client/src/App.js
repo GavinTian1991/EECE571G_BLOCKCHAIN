@@ -74,8 +74,10 @@ class App extends Component {
     })
   }
   async createNewCandidate(name,photoURL,candidateInfo){
-    this.setState ({loading: true})
-    alert("setState candidate information submit!");
+    this.setState ({loading: true});
+    alert("Now estimate gas amount");
+    //const gasAmount = await this.state.deployedVoteContract.methods.createNewCandidate(name,photoURL,candidateInfo,109).estimateGas({from: this.state.account});// this.state.deployedEthbay is hte contract we access before
+    alert("gas amount OK, start call fun");
     this.state.deployedVoteContract.methods.createNewCandidate(name,photoURL,candidateInfo,109).send({from: this.state.account})
     .once('receipt', (receipt)=> {
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt

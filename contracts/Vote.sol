@@ -236,7 +236,7 @@ contract Vote {
             OneVote memory myNewVote = OneVote(_candidateId,_voteNum);
              voters[msg.sender].voteUsed += _voteNum;
               voters[msg.sender].myVote[_voter.numOfPeopleNominated] = myNewVote;
-            voters[msg.sender] = _voter;
+           // voters[msg.sender] = _voter;
             
             Candidate memory _cadidate = candidates[_candidateId];
             _cadidate.candidateTotalVote += _voteNum;
