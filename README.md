@@ -50,7 +50,7 @@ react + web3 + bootstrap
 
 Wireframe:
 
-![Image of wireframe](https://drive.google.com/open?id=1k3r3HAVgT8pnROWGebmbYVEDkUZ8F8dK)
+![Image of wireframe](wireframe.jpg)
 
 ## TODO
 
