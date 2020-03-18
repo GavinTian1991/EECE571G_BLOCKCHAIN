@@ -43,12 +43,25 @@ Mar. 23rd, 2020
 
 ## Framework
 ### Back-end
-solidity + truffle + Genache
+solidity + truffle + Ganache
 
 ### Front-end
 react + web3 + bootstrap
 
-## TODO
-Front-end
+Wireframe:
 
-truffle test
+![Image of wireframe](https://drive.google.com/open?id=1k3r3HAVgT8pnROWGebmbYVEDkUZ8F8dK)
+
+## TODO
+
+- [ ] Front-end components
+- [ ] truffle test
+- [x] WireFrame
+- [x] Smart contract V1.0
+- [ ] Whitepaper
+
+## Future Development
+
+* Can deploy multiple votings for a company
+* Can deploy different shares of different companies
+
