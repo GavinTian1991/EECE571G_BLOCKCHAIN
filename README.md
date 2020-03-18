@@ -64,4 +64,5 @@ Wireframe:
 
 * Can deploy multiple votings for a company
 * Can deploy different shares of different companies
+* Can deploy multiple votings for different companies
 
