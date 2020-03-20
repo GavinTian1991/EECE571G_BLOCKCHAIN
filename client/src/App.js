@@ -1,107 +1,159 @@
 import React, { Component } from "react";
-import getWeb3 from "./getWeb3";
-import Can from './Can';
-import CustomDate from './CustomDate';
-import VoteContract from "./contracts/Vote.json";
-import canRawData from "./data/candidates.json";
+import Web3 from 'web3';
+import VoteContract from "./contracts/Vote";
+import Addressbar from './Addressbar';
+import NavigationBar from './NavigationBar.js';
+import {Navbar,Nav} from 'react-bootstrap';
+import {Link,BrowserRouter as Router,Switch,Route} from 'react-router-dom';
+import CreateNewCandidate from './CreateNewCandidate.js';
+import MyAccount from './MyAccount.js';
+import TestPage from './TestPage.js';
 import "./App.css";
 
 
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    //read candidate image and information from Json file
-    const requireContext = require.context("./data/images",true, /^\.\/.*\.jpg$/);
-    const canImages = requireContext.keys().map(requireContext);
-
-    this.state = { 
-      web3: null, 
-      accounts: null, 
-      voteContract: null, 
+  constructor(props){
+     super(props);
+     
+     this.state = {
+      account: '', // the account here is the account in metamask, so this is why we should reload the page after add an account
+      totalCandidate: 0,
       candidates: [],
-      canStateImages: null, 
-      canStateData: null 
+      loading: true
     }
 
-    this.state = { canStateImages: canImages, canStateData: canRawData, candidates: [] };
+    this.getWeb3Provider = this.getWeb3Provider.bind(this);
+    this.connectToBlockchain = this.connectToBlockchain.bind(this);
+
+    this.changeMyvote = this.changeMyvote.bind(this);
+    this.createNewCandidate = this.createNewCandidate.bind(this);
+    this.deployShareHold = this.deployShareHold.bind(this);
+    this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
+    this.voteForCandidate = this.voteForCandidate.bind(this);
+
+    this.getMyInfo = this.getMyInfo.bind(this);
+
+
   }
 
-  componentDidMount = async () => {
-    try {
-      // Get network provider and web3 instance.
-      const web3 = await getWeb3(); 
-
-      // Use web3 to get the user's accounts.
-      const accounts = await web3.eth.getAccounts();
-
-      // Get the contract instance.
-      const networkId = await web3.eth.net.getId();
-      const deployedNetwork = VoteContract.networks[networkId];
-      const voteContractInstance = new web3.eth.Contract(VoteContract.abi, deployedNetwork.address);
-
-      // Set web3, accounts, and contract to the state
-      this.setState({ web3, accounts, voteContract: voteContractInstance });
-
-      const voteName = await voteContractInstance.methods.voteName().call();
-      console.log(voteName);
-
-      const candidatesCount = await voteContractInstance.methods.candidatesCount().call();
-      console.log(candidatesCount);
-
-
-      //If there is no candidate data in blockchain, read from Json
-      if(candidatesCount == 0){
-          const promises = this.state.canStateData.map(async data => {
-            const canTmp = await voteContractInstance.methods.createCandidate(data.name, 
-              data.age, data.party).send({from: accounts[0]});
-            return canTmp
-          })
-          await Promise.all(promises)
-      }
-
-      //copy candiddates info. from blockchain to local
-      for (let j = 1; j <= candidatesCount; j++) {
-        const candidate = await voteContractInstance.methods.candidates(j).call();
-        const candidates = this.state.candidates;
-        candidates.push({
-          id: candidate[0],
-          name: candidate[1],
-          age: candidate[2],
-          party: candidate[3],
-          voteCount: candidate[4]
-        });
-        this.setState({ candidates: candidates })
-      }
-
-      console.log(this.state.candidates);
-
-    } catch (error) {
-      // Catch any errors for any of the above operations.
-      alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`,
-      );
-      console.error(error);
+  async componentDidMount(){
+    await this.getWeb3Provider();
+    await this.connectToBlockchain();
+  }
+  
+  async getWeb3Provider(){
+    if (window.ethereum) {
+      window.web3 = new Web3(window.ethereum);
+      await window.ethereum.enable();
     }
-  };
-
-  voteForCandidate = async (_candidateId) => {
-    await this.state.voteContract.methods.vote(_candidateId).send({from: this.state.accounts[0]})
+    else if (window.web3) {
+      window.web3 = new Web3(window.web3.currentProvider); // try to connect metamask
+    }
+    else {
+        window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!');
+    }
   }
 
+  async connectToBlockchain(){
+    const web3 = window.web3;
+    const accounts = await web3.eth.getAccounts();
+    this.setState({account: accounts[0]})
+    const networkId = await web3.eth.net.getId() // get network id from metamask
+    const networkData = VoteContract.networks[networkId]; // try use access network id  to access data from ethbay doc
+    if(networkData) {
+      const deployedVoteContract = new web3.eth.Contract(VoteContract.abi, networkData.address); // access the contract, address is the contract address, abi work as a bridge
+      this.setState({deployedVoteContract: deployedVoteContract}); // add the contract to state
+      this.setState({loading: false})
+    } else {
+      window.alert('Ethbay contract is not found in your blockchain.')
+    }
+  
+  }
+
+  async changeMyvote(candidateId,newVote,voteInfoNum){
+    this.setState ({loading: true})
+   this.state.deployedVoteContract.methods.changeMyvote(candidateId,newVote,voteInfoNum,309).send({from: this.state.account})
+    .once('receipt', (receipt)=> {
+      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
+    })
+  }
+  
+  // call the voters()
+  async getMyInfo(address){
+    const myInfo = await this.state.deployedVoteContract.methods.voters(address).call();
+    return myInfo;
+  }
+  async createNewCandidate(name,photoURL,candidateInfo){
+    this.setState ({loading: true});
+    alert("Now estimate gas amount");
+    //const gasAmount = await this.state.deployedVoteContract.methods.createNewCandidate(name,photoURL,candidateInfo,109).estimateGas({from: this.state.account});// this.state.deployedEthbay is hte contract we access before
+    alert("gas amount OK, start call fun");
+    this.state.deployedVoteContract.methods.createNewCandidate(name,photoURL,candidateInfo,109).send({from: this.state.account})
+    .once('receipt', (receipt)=> {
+      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
+    })
+  }
+  async deployShareHold(address,shareHold){
+    this.setState ({loading: true});
+    alert("gas amount OK, start call fun");
+    this.state.deployedVoteContract.methods.deployShareHold(address,shareHold).send({from: this.state.account})
+    .once('receipt', (receipt)=> {
+      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
+    })
+  }
+  async lookUpVoteRecord(recordId){
+    this.setState ({loading: true})
+    // will emit event containing the vote record Info
+    this.state.deployedVoteContract.methods.lookUpVoteRecord(recordId).send({from: this.state.account})
+    .once('receipt', (receipt)=> {
+      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
+    })
+  }
+  async voteForCandidate(candidateId,voteNum){
+    this.setState ({loading: true})
+    this.state.deployedVoteContract.methods.voteForCandidate(candidateId,voteNum,309).send({from: this.state.account})
+    .once('receipt', (receipt)=> {
+      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
+    })
+  }
+
+ 
+  
   render() {
-    if (!this.state.web3) {
-      return <div>Loading Web3, accounts, and contract...</div>;
-    }
     return (
-      <div className="App">
-        <p>Your accout address is: {this.state.accounts[0]}</p>
-        <Can canData={this.state.candidates} 
-             canImages={this.state.canStateImages} 
-             voteForCandidate = {this.voteForCandidate}/>
-        <br/>
-        <CustomDate />
+      <Router>
+        <NavigationBar/>
+      <div style={{margin: '20px'}}>
+        <div>
+          <h1>Welcome</h1>
+        {"Your Address: " + this.state.account}
+        
+        </div>
+        
+          
+            
+              { this.state.loading 
+                ? 
+                  <div><p className="text-center">Loading ...</p></div> 
+                : 
+                <Switch>
+                  <Route path="/createCandidate">
+                    <CreateNewCandidate createNewCandidate={this.createNewCandidate} deployShareHold={this.deployShareHold}/>
+                  </Route>
+                  <Route path="/myaccount">
+                    <MyAccount getMyInfo={this.getMyInfo} account={this.state.account}/>                  
+                  </Route>
+                  <Route path="/">
+                  <TestPage/>   
+                  </Route>
+                </Switch>
+                  }
+            
+          
+        
       </div>
+      </Router>
     );
   }
 }
