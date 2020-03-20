@@ -2,9 +2,12 @@ import React, { Component } from "react";
 import Web3 from 'web3';
 import VoteContract from "./contracts/Vote";
 import Addressbar from './Addressbar';
+import NavigationBar from './NavigationBar.js';
 import {Navbar,Nav} from 'react-bootstrap';
 import {Link,BrowserRouter as Router,Switch,Route} from 'react-router-dom';
 import CreateNewCandidate from './CreateNewCandidate.js';
+import MyAccount from './MyAccount.js';
+import TestPage from './TestPage.js';
 import "./App.css";
 
 
@@ -28,6 +31,8 @@ class App extends Component {
     this.deployShareHold = this.deployShareHold.bind(this);
     this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
     this.voteForCandidate = this.voteForCandidate.bind(this);
+
+    this.getMyInfo = this.getMyInfo.bind(this);
 
 
   }
@@ -73,6 +78,12 @@ class App extends Component {
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
     })
   }
+  
+  // call the voters()
+  async getMyInfo(address){
+    const myInfo = await this.state.deployedVoteContract.methods.voters(address).call();
+    return myInfo;
+  }
   async createNewCandidate(name,photoURL,candidateInfo){
     this.setState ({loading: true});
     alert("Now estimate gas amount");
@@ -84,7 +95,8 @@ class App extends Component {
     })
   }
   async deployShareHold(address,shareHold){
-    this.setState ({loading: true})
+    this.setState ({loading: true});
+    alert("gas amount OK, start call fun");
     this.state.deployedVoteContract.methods.deployShareHold(address,shareHold).send({from: this.state.account})
     .once('receipt', (receipt)=> {
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
@@ -111,18 +123,8 @@ class App extends Component {
   render() {
     return (
       <Router>
-        <Navbar bg="dark" variant="dark">
-				<Link to={""} className="navbar-brand">My D-Vote</Link>
-				
-				<Nav className="mr-auto">
-			      <Link to={{pathname:"/",createNewCandidate:this.createNewCandidate}} className="nav-link">Create New Candidate</Link>
-			      <Link to={{pathname:"deployShareHold"}} className="nav-link">Deploy ShareHold</Link>
-                  <Link to={{pathname:"lookUpVoteRecord"}} className="nav-link">Look Up My Vote Record</Link>
-                  <Link to={{pathname:"voteForCandidate"}} className="nav-link">Vote For Candidate</Link>
-                  
-			    </Nav>
-				</Navbar>
-      <div>
+        <NavigationBar/>
+      <div style={{margin: '20px'}}>
         <div>
           <h1>Welcome</h1>
         {"Your Address: " + this.state.account}
@@ -136,8 +138,14 @@ class App extends Component {
                   <div><p className="text-center">Loading ...</p></div> 
                 : 
                 <Switch>
+                  <Route path="/createCandidate">
+                    <CreateNewCandidate createNewCandidate={this.createNewCandidate} deployShareHold={this.deployShareHold}/>
+                  </Route>
+                  <Route path="/myaccount">
+                    <MyAccount getMyInfo={this.getMyInfo} account={this.state.account}/>                  
+                  </Route>
                   <Route path="/">
-                    <CreateNewCandidate createNewCandidate={this.createNewCandidate}/>
+                  <TestPage/>   
                   </Route>
                 </Switch>
                   }
