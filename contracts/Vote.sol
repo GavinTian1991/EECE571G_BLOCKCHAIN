@@ -124,14 +124,14 @@ contract Vote {
     
     
     
-   // this func create a new candidate
+   // this func create a new candidate, only deployer can call this func
    // name and info of candidate must be not null
    // default candidate photo url is: https://en.wikipedia.org/wiki/Anonymous_(group)#/media/File:Anonymous_emblem.svg
-   // the current time is the value returned by JS func:
-   // let date = (new Date()).getTime();
-   //let currentDate = date / 1000; 
-   // current time shoulb be within the creating new cadidate period
-   // cumulativevoting
+   // future direction: the current time is the value returned by JS func:
+   // 1.let date = (new Date()).getTime();
+   // 2.let currentDate = date / 1000; 
+   // current time should be within the creating new cadidate period
+
     function createNewCandidate(string memory _cadidateName, string memory _candidatePhoto, string memory _cadidateInfo, uint256 _currentDate) public{
         require(msg.sender == voteDeployer, "You can't create new cadidate. Only deployer can do this.");
         require(_currentDate > addCandidateStartDate && _currentDate < addCandidateEndDate, "The stage for adding new candiddate is not valid, no candidate can be added");
@@ -145,10 +145,10 @@ contract Vote {
     }
     
     
-    // this func destribute the share
-    // the share of one voter should not greater than max share
-    // the current total share should not greater than total share available
-    // so the vote number should be share*maxNominatedNum if it's cumulative
+    // this func allocate the share to one shareholder, only deployer can call this func
+    // the share of one voter should not greater than max share amount that a voter can hold
+    // the currentTotalShareNum+_stockNum should not greater than total share available
+
     function allocateShare(address _voterAddr, uint _stockNum) public{
         require(msg.sender == voteDeployer, "You can't deploy stock.Only deployer can do this.");
         require(_stockNum <= maxShareNum, "You can't deploy this many stock for this voter.");
@@ -174,15 +174,18 @@ contract Vote {
     }
 
     // this func let voter vote for a candidate
-    // the current time is the value returned by JS func:
-    // let date = (new Date()).getTime();
-    //let currentDate = date / 1000; 
+    //_candidateId: the candidate you want to vote
+    //_voteNum: the number of votes
+    // _currentDate: future direction, the current time is the value returned by JS func:
+    // 1.let date = (new Date()).getTime();
+    // 2.let currentDate = date / 1000; 
+    //basic logic
     // current time should be within the voting period
     // if voter has not voted before, then he can vote
-    // if voter has voted before but voting modifying times < 4 then he can vote again
-    // if numOfPeopleNominated < maxNominatedNum he can voteForCandidate
-    //if voter has stock he can voteForCandidate
+    // if numOfPeopleNominated < maxNominatedNum then he can voteForCandidate
+    // if voter has stock then he can voteForCandidate
     // if voter still has votes left he can vote
+
     function voteForCandidate(uint _candidateId, uint _voteNum, uint256 _currentDate) public{
         require(_currentDate > voteStartDate && _currentDate < voteEndDate, "The stage for voting is not valid, no vote can be created");       
         require(_candidateId > 0 && _candidateId <= totalCandidateNumber, 'Candidate invalid');
@@ -247,7 +250,7 @@ contract Vote {
         emit vote(_candidateId,_voter.voteTime,_voter.hasVoted);
     }
     
-    // this func can let you look up the vote record according to recordID
+    // this func can let you look up all the vote records
     function lookUpVoteRecord() public{
         uint num_p = voters[msg.sender].numOfPeopleNominated;
         uint256[] memory recordID = new uint256[](num_p);
@@ -264,6 +267,14 @@ contract Vote {
     
     
     // this func change the EXISTING record in myVote struct.
+    //_candidateId: the new candidate you want to vote
+    //_newVote: num of votes
+    //_voteInfoNum: the voting record you want to edit
+    // _currentDate: future direction. For now it will be a constant input
+    //basic logic
+    // it will first retrieve the vote you want to modify
+    // then it will deduct the votes from the previous candidate you vote
+    // after that it will add the vote to the new candidate you want to vote
     // this func won't change the numOfPeopleNominated
     function changeMyVote(uint _candidateId, uint _newVote, uint _voteInfoNum, uint256 _currentDate) public{
         require(_currentDate > voteStartDate && _currentDate < voteEndDate, "The stage for voting is not valid, no vote can be created");       

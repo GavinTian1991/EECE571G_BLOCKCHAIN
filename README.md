@@ -15,7 +15,7 @@ Mar. 23rd, 2020
   4. truffle migrate --reset
   5. My abi file is placed in default folder(build/contract), otherwise my truffle can't modify the .json file(don't know why). Please copy all the json files into src/contracts after running "migrate"!!! Then the App.js can access the contract abi
   6. type "npm start" under ./client
-  7. Copy account key from Ganache and import into metamask with new created account
+  7. Copy first account key from Ganache and import into metamask with new created account
   9. Refresh the page
 ## Features
    This Dapp is for straight voting and cumulative voting on the blockchain.
