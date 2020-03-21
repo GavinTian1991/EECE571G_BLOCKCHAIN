@@ -26,7 +26,7 @@ export default class CreateNewCandidate extends Component{
 
    submitShare = event => {
     event.preventDefault();
-    this.props.deployShareHold(this.state.address,this.state.amount);
+    this.props.allocateShare(this.state.address,this.state.amount);
     
     this.setState({address:'',amount:''});
    }

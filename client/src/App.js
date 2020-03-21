@@ -28,7 +28,7 @@ class App extends Component {
 
     this.changeMyvote = this.changeMyvote.bind(this);
     this.createNewCandidate = this.createNewCandidate.bind(this);
-    this.deployShareHold = this.deployShareHold.bind(this);
+    this.allocateShare = this.allocateShare.bind(this);
     this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
     this.voteForCandidate = this.voteForCandidate.bind(this);
 
@@ -109,10 +109,10 @@ class App extends Component {
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
     })
   }
-  async deployShareHold(address,shareHold){
+  async allocateShare(address,shareHold){
     this.setState ({loading: true});
     alert("gas amount OK, start call fun");
-    this.state.deployedVoteContract.methods.deployShareHold(address,shareHold).send({from: this.state.account})
+    this.state.deployedVoteContract.methods.allocateShare(address,shareHold).send({from: this.state.account})
     .once('receipt', (receipt)=> {
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
     })
@@ -147,10 +147,10 @@ class App extends Component {
                 : 
                 <Switch>
                   <Route path="/createCandidate">
-                    <CreateNewCandidate createNewCandidate={this.createNewCandidate} deployShareHold={this.deployShareHold}/>
+                    <CreateNewCandidate createNewCandidate={this.createNewCandidate} allocateShare={this.allocateShare}/>
                   </Route>
                   <Route path="/myaccount">
-                    <MyAccount getMyInfo={this.getMyInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord}/>                  
+                    {/* <MyAccount getMyInfo={this.getMyInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord}/>                   */}
                   </Route>
                   <Route path="/">
                   <TestPage/>   
