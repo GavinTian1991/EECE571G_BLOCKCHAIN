@@ -33,6 +33,7 @@ class App extends Component {
     this.voteForCandidate = this.voteForCandidate.bind(this);
 
     this.getMyInfo = this.getMyInfo.bind(this);
+    this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
 
 
   }
@@ -84,11 +85,25 @@ class App extends Component {
     const myInfo = await this.state.deployedVoteContract.methods.voters(address).call();
     return myInfo;
   }
+
+  //call lookUpVoteRecord()
+  async lookUpVoteRecord(recordId){
+
+    this.state.deployedVoteContract.methods.lookUpVoteRecord(recordId).send({from: this.state.account});
+
+    const web3 = window.web3; //first get web3
+    const currentBlockNum = await web3.eth.getBlockTransactionCount("latest");
+    let returnResults;
+    await this.state.deployedVoteContract.getPastEvents('lookUpMyVote',{
+      filter: {recordID: recordId, myAddr: this.state.account}, 
+      fromBlock: currentBlockNum
+  }, function(error, events){ returnResults = events[0].returnValues;});
+ return returnResults;
+  }
+
   async createNewCandidate(name,photoURL,candidateInfo){
     this.setState ({loading: true});
-    alert("Now estimate gas amount");
-    //const gasAmount = await this.state.deployedVoteContract.methods.createNewCandidate(name,photoURL,candidateInfo,109).estimateGas({from: this.state.account});// this.state.deployedEthbay is hte contract we access before
-    alert("gas amount OK, start call fun");
+
     this.state.deployedVoteContract.methods.createNewCandidate(name,photoURL,candidateInfo,109).send({from: this.state.account})
     .once('receipt', (receipt)=> {
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
@@ -102,14 +117,7 @@ class App extends Component {
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
     })
   }
-  async lookUpVoteRecord(recordId){
-    this.setState ({loading: true})
-    // will emit event containing the vote record Info
-    this.state.deployedVoteContract.methods.lookUpVoteRecord(recordId).send({from: this.state.account})
-    .once('receipt', (receipt)=> {
-      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
-    })
-  }
+
   async voteForCandidate(candidateId,voteNum){
     this.setState ({loading: true})
     this.state.deployedVoteContract.methods.voteForCandidate(candidateId,voteNum,309).send({from: this.state.account})
@@ -142,7 +150,7 @@ class App extends Component {
                     <CreateNewCandidate createNewCandidate={this.createNewCandidate} deployShareHold={this.deployShareHold}/>
                   </Route>
                   <Route path="/myaccount">
-                    <MyAccount getMyInfo={this.getMyInfo} account={this.state.account}/>                  
+                    <MyAccount getMyInfo={this.getMyInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord}/>                  
                   </Route>
                   <Route path="/">
                   <TestPage/>   

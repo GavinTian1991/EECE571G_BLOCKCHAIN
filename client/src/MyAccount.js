@@ -6,8 +6,9 @@ import { Icon } from 'semantic-ui-react';
 export default class MyAccount extends Component{
   constructor(props){
      super(props);
-     this.state={account:this.props.account,myInfo:this.initialInfo};
-     //this.setState({account:this.props.account,myInfo:this.initialInfo});
+     this.state={account:this.props.account,myInfo:this.initialInfo,records:[]};
+    
+     this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
 
   }
   initialInfo={sharehold:0 ,totalVoteNum:0,voteUsed:0,numOfPeopleNominated:0,voteTime:0};
@@ -18,6 +19,12 @@ export default class MyAccount extends Component{
   async componentDidMount(){
     const myInfomation = await this.props.getMyInfo(this.state.account);
     this.setState({myInfo:myInfomation});
+  }
+
+  async lookUpVoteRecord(){
+    const record = await this.props.lookUpVoteRecord(1);
+    this.setState({records:[...this.state.records,record]});
+    alert("show record in records:\n candidateId:" + this.state.records[0].candidateID + " Votes: "+ this.state.records[0].voteNum);
   }
 
  render(){
@@ -36,15 +43,16 @@ export default class MyAccount extends Component{
          </ListGroup>
           </Card.Body>
           <Card.Footer>
-            
+          <Button onClick={this.lookUpVoteRecord}  variant="secondary">
+                  <Icon name='search' /> Search My Voting History
+         </Button>
           </Card.Footer>
         </Card>
         <Card>
-        <Card.Header><Icon name='plus square' /> Split Share</Card.Header>
+        <Card.Header><Icon name='plus square' /> My Voting Records</Card.Header>
           <Card.Body>
           <ListGroup className="list-group-flush">
-                <ListGroupItem>Total </ListGroupItem>
-                <ListGroupItem>Dapibus ac facilisis in</ListGroupItem>
+                
                 <ListGroupItem>Vestibulum at eros</ListGroupItem>
          </ListGroup>
           </Card.Body>
