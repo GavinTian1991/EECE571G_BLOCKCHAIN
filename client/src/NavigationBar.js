@@ -9,8 +9,8 @@ class NavigationBar extends React.Component{
 				
 				<Nav className="mr-auto">
 			      <Link to={"/"} className="nav-link">Vote Info</Link>
-			      <Link to={"/deployShareHold"} className="nav-link">Vote</Link>
-                  <Link to={"/lookUpVoteRecord"} className="nav-link">Results</Link>
+			      <Link to={"/gotovote"} className="nav-link">Vote</Link>
+                  <Link to={"/viewresult"} className="nav-link">Results</Link>
                   <Link to={"/myaccount"} className="nav-link">My account</Link>
                   <Link to={"/createCandidate"} className="nav-link">Vote Setting</Link>
 			    </Nav>

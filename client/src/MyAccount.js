@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import {Card,Form, Button, Table,CardDeck,ListGroup,ListGroupItem} from 'react-bootstrap';
-import Web3 from 'web3';
 import { Icon } from 'semantic-ui-react';
 
 export default class MyAccount extends Component{

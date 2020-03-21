@@ -1,13 +1,12 @@
 import React, { Component } from "react";
 import Web3 from 'web3';
 import VoteContract from "./contracts/Vote";
-import Addressbar from './Addressbar';
 import NavigationBar from './NavigationBar.js';
-import {Navbar,Nav} from 'react-bootstrap';
-import {Link,BrowserRouter as Router,Switch,Route} from 'react-router-dom';
+import {BrowserRouter as Router,Switch,Route} from 'react-router-dom';
 import CreateNewCandidate from './CreateNewCandidate.js';
 import MyAccount from './MyAccount.js';
 import TestPage from './TestPage.js';
+import ViewCandidates from './ViewCandidates.js'; 
 import "./App.css";
 
 
@@ -27,7 +26,11 @@ class App extends Component {
     this.connectToBlockchain = this.connectToBlockchain.bind(this);
 
     this.changeMyvote = this.changeMyvote.bind(this);
+
     this.createNewCandidate = this.createNewCandidate.bind(this);
+    this.viewAllCandidate = this.viewAllCandidate.bind(this);
+
+
     this.allocateShare = this.allocateShare.bind(this);
     this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
     this.voteForCandidate = this.voteForCandidate.bind(this);
@@ -71,6 +74,7 @@ class App extends Component {
     }
   
   }
+  // the func below call the solidity func
 
   async changeMyvote(candidateId,newVote,voteInfoNum){
     this.setState ({loading: true})
@@ -102,6 +106,7 @@ class App extends Component {
    return returnResults;
   }
 
+  //call createNewCandidate(). For now current time is just a constant. Future direction will change to the real current time
   async createNewCandidate(name,photoURL,candidateInfo){
     this.setState ({loading: true});
 
@@ -110,6 +115,21 @@ class App extends Component {
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
     })
   }
+
+ //call viewAllCandidate(). Can return an array containing item obj
+  async viewAllCandidate(){
+    const totalNumber = await this.state.deployedVoteContract.methods.totalCandidateNumber().call(); 
+    let candidates=[];
+    candidates.length = totalNumber;
+    for (var i = 1;i<= totalNumber;i++) {
+        const candidate = await this.state.deployedVoteContract.methods.candidates(i).call(); // get each items info, item is a mapping(addr => Item)
+        candidates[i] = candidate; // append the item into the existing item array
+    }
+    return candidates;
+  }
+
+ 
+
   async allocateShare(address,shareHold){
     this.setState ({loading: true});
     alert("gas amount OK, start call fun");
@@ -152,6 +172,9 @@ class App extends Component {
                   </Route>
                   <Route path="/myaccount">
                     <MyAccount getMyInfo={this.getMyInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord}/>                  
+                  </Route>
+                  <Route path="/gotovote">
+                    <ViewCandidates viewAllCandidate={this.viewAllCandidate}/>                  
                   </Route>
                   <Route path="/">
                   <TestPage/>   
