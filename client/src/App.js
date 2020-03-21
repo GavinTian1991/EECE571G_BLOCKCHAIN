@@ -87,18 +87,19 @@ class App extends Component {
   }
 
   //call lookUpVoteRecord()
-  async lookUpVoteRecord(recordId){
+  async lookUpVoteRecord(){
 
-    this.state.deployedVoteContract.methods.lookUpVoteRecord(recordId).send({from: this.state.account});
+    this.state.deployedVoteContract.methods.lookUpVoteRecord().send({from: this.state.account});
 
     const web3 = window.web3; //first get web3
     const currentBlockNum = await web3.eth.getBlockTransactionCount("latest");
     let returnResults;
     await this.state.deployedVoteContract.getPastEvents('lookUpMyVote',{
-      filter: {recordID: recordId, myAddr: this.state.account}, 
+      filter: {myAddr: this.state.account}, 
       fromBlock: currentBlockNum
   }, function(error, events){ returnResults = events[0].returnValues;});
- return returnResults;
+
+   return returnResults;
   }
 
   async createNewCandidate(name,photoURL,candidateInfo){
@@ -150,7 +151,7 @@ class App extends Component {
                     <CreateNewCandidate createNewCandidate={this.createNewCandidate} allocateShare={this.allocateShare}/>
                   </Route>
                   <Route path="/myaccount">
-                    {/* <MyAccount getMyInfo={this.getMyInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord}/>                   */}
+                    <MyAccount getMyInfo={this.getMyInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord}/>                  
                   </Route>
                   <Route path="/">
                   <TestPage/>   
