@@ -102,7 +102,7 @@ contract Vote {
 
 // voting process
 // 1. define the candidate, candidate modifying period, voting period, max Nominating Num, total stock, max stock, and voting type
-// 2. deploy the sharhold for voters, voter without any share hold cannot vote
+// 2. deployer allocate the share of each voters, voter without any share cannot vote
 // 3. if it's straight voting, then every valid voter can have one vote per share for each nominator
 //    e.g. The voting have 10 candidate, the voting need to select 3 of them to be in board of directors.
 //          Voter Ben has 20 stock thus, he can nominate 3 people, and all these three will have 20 votes
