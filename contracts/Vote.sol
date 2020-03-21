@@ -12,7 +12,7 @@ contract Vote {
     uint256 public voteEndDate;
     
     // deployer decide who can vote
-    // deployer decide the shareholds of each Voter
+    // deployer decide the stock of each Voter
     address public voteDeployer;
     
     // how many people are in the cadidate map
@@ -26,14 +26,14 @@ contract Vote {
     // 2-> cumulative voting
     uint voteType=1;
     
-    // should decide the total shareholds
-    // should decide the threshold of the max sharehold of a Voter
-    // the sharehold cannot be changed after the deployer confirms
-    uint totalShareHold;
-    uint maxSharehold;
-    uint public currentTotalShareHold = 0;
+    // should decide the total stock
+    // should decide the threshold of the max stock of a Voter
+    // the stock cannot be changed after the deployer confirms
+    uint totalShareNum;
+    uint maxShareNum;
+    uint public currentTotalShareNum = 0;
     
-    // deployer should confirm when finish deploying the sharehold
+    // deployer should confirm when finish deploying the stock
     bool comfirm = false;
     
     mapping(uint => Candidate) public candidates;
@@ -54,7 +54,7 @@ contract Vote {
 
     struct Voter{
         uint voteTime; // how many times I have changed my voted
-        uint sharehold;
+        uint stock;
         uint totalVoteNum; // how many votes do I have
         uint voteUsed; // how many votes do I use
         uint numOfPeopleNominated; //  how many people do I nominate
@@ -62,9 +62,9 @@ contract Vote {
         bool hasVoted;
     }
     
-    event deploySharehold(
+    event allocateStock(
         address voter,
-        uint sharehold
+        uint stock
     );
     
     event newVoteRecord(
@@ -94,21 +94,21 @@ contract Vote {
     
     event lookUpMyVote(
         address myAddr,
-        uint recordID,
-        uint candidateID,
-        uint voteNum
+        uint[] recordID,
+        uint[] candidateID,
+        uint[] voteNum
         );
 
 
 // voting process
-// 1. define the candidate, candidate modifying period, voting period, max Nominating Num, total sharehold, max sharehold, and voting type
+// 1. define the candidate, candidate modifying period, voting period, max Nominating Num, total stock, max stock, and voting type
 // 2. deploy the sharhold for voters, voter without any share hold cannot vote
 // 3. if it's straight voting, then every valid voter can have one vote per share for each nominator
 //    e.g. The voting have 10 candidate, the voting need to select 3 of them to be in board of directors.
-//          Voter Ben has 20 shareholds thus, he can nominate 3 people, and all these three will have 20 votes
-// 4. if it's cumulative voting, then every voter can have voteNum = shareholds*maxNominatedNum, and voter can freely distrubute his votes
+//          Voter Ben has 20 stock thus, he can nominate 3 people, and all these three will have 20 votes
+// 4. if it's cumulative voting, then every voter can have voteNum = stock*maxNominatedNum, and voter can freely distrubute his votes
 
-    constructor(uint256 _addStartDate, uint256 _addEndDate, uint256 _startDate, uint256 _endDate, uint256 _maxNominatedNum,uint256 _totalShareHold, uint256 _maxSharehold, uint _voteType) public {
+    constructor(uint256 _addStartDate, uint256 _addEndDate, uint256 _startDate, uint256 _endDate, uint256 _maxNominatedNum,uint256 _totalShareNum, uint256 _maxShareNum, uint _voteType) public {
         voteName = "block chain vote app";
         addCandidateStartDate = _addStartDate;
         addCandidateEndDate = _addEndDate;
@@ -117,8 +117,8 @@ contract Vote {
         voteType = _voteType;
         maxNominatedNum= _maxNominatedNum;
         voteDeployer = msg.sender;
-        totalShareHold = _totalShareHold;
-        maxSharehold = _maxSharehold;
+        totalShareNum = _totalShareNum;
+        maxShareNum = _maxShareNum;
     }
     
     
@@ -145,32 +145,32 @@ contract Vote {
     }
     
     
-    // this func detribute the sharehold
-    // the sharehold of one voter should not greater than max sharehold
-    // the current total sharehold should not greater than total sharehold available
-    // so the vote number should be sharehold*maxNominatedNum if it's cumulative
-    function deployShareHold(address _voterAddr, uint _shareHold) public{
-        require(msg.sender == voteDeployer, "You can't deploy sharehold.Only deployer can do this.");
-        require(_shareHold <= maxSharehold, "You can't deploy this many shareholds for this voter.");
-        require((currentTotalShareHold+_shareHold) <= totalShareHold, "You can't deploy more shareholds, current shareholds are greater than total shareholds.");
+    // this func destribute the share
+    // the share of one voter should not greater than max share
+    // the current total share should not greater than total share available
+    // so the vote number should be share*maxNominatedNum if it's cumulative
+    function allocateShare(address _voterAddr, uint _stockNum) public{
+        require(msg.sender == voteDeployer, "You can't deploy stock.Only deployer can do this.");
+        require(_stockNum <= maxShareNum, "You can't deploy this many stock for this voter.");
+        require((currentTotalShareNum+_stockNum) <= totalShareNum, "You can't deploy more stock, current stock are greater than total stock.");
         
-        // add to currentTotalShareHold
-        currentTotalShareHold = currentTotalShareHold+_shareHold;
+        // add to currentTotalShareNum
+        currentTotalShareNum = currentTotalShareNum+_stockNum;
         
         Voter memory _voter =  voters[_voterAddr];
         
-        _voter.sharehold = _shareHold;
+        _voter.stock = _stockNum;
         
-        _voter.totalVoteNum = _shareHold*maxNominatedNum;
+        _voter.totalVoteNum = _stockNum*maxNominatedNum;
         // if(voteType==1){
-        //     _voter.totalVoteNum = _shareHold;
+        //     _voter.totalVoteNum = _stockNum;
         // }else{
-        //     _voter.totalVoteNum = _shareHold*maxNominatedNum;
+        //     _voter.totalVoteNum = _stockNum*maxNominatedNum;
         // }
         
         voters[_voterAddr] = _voter;
         
-        emit deploySharehold(_voterAddr,_shareHold);
+        emit allocateStock(_voterAddr,_stockNum);
     }
 
     // this func let voter vote for a candidate
@@ -181,13 +181,13 @@ contract Vote {
     // if voter has not voted before, then he can vote
     // if voter has voted before but voting modifying times < 4 then he can vote again
     // if numOfPeopleNominated < maxNominatedNum he can voteForCandidate
-    //if voter has sharehold he can voteForCandidate
+    //if voter has stock he can voteForCandidate
     // if voter still has votes left he can vote
     function voteForCandidate(uint _candidateId, uint _voteNum, uint256 _currentDate) public{
         require(_currentDate > voteStartDate && _currentDate < voteEndDate, "The stage for voting is not valid, no vote can be created");       
         require(_candidateId > 0 && _candidateId <= totalCandidateNumber, 'Candidate invalid');
         require(voters[msg.sender].hasVoted == false || voters[msg.sender].voteTime < 3, 'You have access your max voting modifying times(3 times)');
-        require(voters[msg.sender].sharehold > 0 , "You don't have any sharehold. You can't vote");
+        require(voters[msg.sender].stock > 0 , "You don't have any stock. You can't vote");
         require(voters[msg.sender].numOfPeopleNominated <= maxNominatedNum , "You can't vote for any more nominator. You can't vote");
         
         
@@ -195,7 +195,7 @@ contract Vote {
         Voter memory _voter =  voters[msg.sender];
         // still has votes left?
         if(voteType==1){
-            require(_voter.voteUsed+voters[msg.sender].sharehold <= _voter.totalVoteNum, "You don't have so many votes");
+            require(_voter.voteUsed+voters[msg.sender].stock <= _voter.totalVoteNum, "You don't have so many votes");
         }else{
             require(_voter.voteUsed+_voteNum <= _voter.totalVoteNum, "You don't have so many votes");
         }
@@ -217,18 +217,18 @@ contract Vote {
         
         if(voteType==1){
             // straight 
-            //vote num = sharehold num
-            OneVote memory myNewVote = OneVote(_candidateId,voters[msg.sender].sharehold);
+            //vote num = stock num
+            OneVote memory myNewVote = OneVote(_candidateId,voters[msg.sender].stock);
 
             voters[msg.sender].myVote[_voter.numOfPeopleNominated] = myNewVote;
             emit newVoteRecord(voters[msg.sender].myVote[_voter.numOfPeopleNominated].candidateId,voters[msg.sender].myVote[_voter.numOfPeopleNominated].voteNum);
             
-            voters[msg.sender].voteUsed += voters[msg.sender].sharehold;
+            voters[msg.sender].voteUsed += voters[msg.sender].stock;
             
-            //voters[msg.sender] = Voter(_voter.voteTime,_voter.sharehold,_voter.totalVoteNum,_voter.voteUsed,_voter.numOfPeopleNominated,myNewVote,true);
+            //voters[msg.sender] = Voter(_voter.voteTime,_voter.stock,_voter.totalVoteNum,_voter.voteUsed,_voter.numOfPeopleNominated,myNewVote,true);
             
             Candidate memory _cadidate = candidates[_candidateId];
-            _cadidate.candidateTotalVote += voters[msg.sender].sharehold;
+            _cadidate.candidateTotalVote += voters[msg.sender].stock;
             candidates[_candidateId] = _cadidate;
         }else{
             // cumulative 
@@ -248,14 +248,23 @@ contract Vote {
     }
     
     // this func can let you look up the vote record according to recordID
-    function lookUpVoteRecord(uint _recordId) public{
-        emit lookUpMyVote(msg.sender,_recordId,voters[msg.sender].myVote[_recordId-1].candidateId,voters[msg.sender].myVote[_recordId-1].voteNum);
+    function lookUpVoteRecord() public{
+        uint num_p = voters[msg.sender].numOfPeopleNominated;
+        uint256[] memory recordID = new uint256[](num_p);
+        uint256[] memory candidateID = new uint256[](num_p);
+        uint256[] memory voteNum = new uint256[](num_p);
+        for(uint _recordId = 0;_recordId < num_p;_recordId++){
+            recordID[_recordId] = _recordId;
+            candidateID[_recordId] = voters[msg.sender].myVote[_recordId].candidateId;
+            voteNum[_recordId] = voters[msg.sender].myVote[_recordId].voteNum;
+        }
+        emit lookUpMyVote(msg.sender,recordID,candidateID,voteNum);
      }
     
     
     
     // this func change the EXISTING record in myVote struct.
-    // this func won't change hte numOfPeopleNominated
+    // this func won't change the numOfPeopleNominated
     function changeMyVote(uint _candidateId, uint _newVote, uint _voteInfoNum, uint256 _currentDate) public{
         require(_currentDate > voteStartDate && _currentDate < voteEndDate, "The stage for voting is not valid, no vote can be created");       
         require(_candidateId > 0 && _candidateId <= totalCandidateNumber, 'Candidate invalid');
@@ -273,7 +282,7 @@ contract Vote {
             uint myLastVoteNum = _voteToModify.voteNum;
             require(_voter.voteUsed-myLastVoteNum+_newVote<= _voter.totalVoteNum, "You don't have so many votes");
         }else{
-            // if you have vote for this candidate then don't voters
+            // if you have vote for this candidate then don't vote, cuz in type 1 every candidate can only be voted once
             bool votedForCandidate = false;
            for(uint i=0;i<=voters[msg.sender].numOfPeopleNominated;i++){
             emit lookForInfo(voters[msg.sender].myVote[i].candidateId,_candidateId);
@@ -302,14 +311,14 @@ contract Vote {
          
         if(voteType==1){
             // straight 
-            //vote num = sharehold num
-            OneVote memory myNewVote = OneVote(_candidateId,voters[msg.sender].sharehold);
-            voters[msg.sender].voteUsed += voters[msg.sender].sharehold;
+            //vote num = stock num
+            OneVote memory myNewVote = OneVote(_candidateId,voters[msg.sender].stock);
+            voters[msg.sender].voteUsed += voters[msg.sender].stock;
             voters[msg.sender].myVote[_voteInfoNum-1] = myNewVote;
 
             
             Candidate memory _cadidate = candidates[_candidateId];
-            _cadidate.candidateTotalVote += voters[msg.sender].sharehold;
+            _cadidate.candidateTotalVote += voters[msg.sender].stock;
             candidates[_candidateId] = _cadidate;
         }else{
             // cumulative 
