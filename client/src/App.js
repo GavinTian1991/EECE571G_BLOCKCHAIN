@@ -1,13 +1,12 @@
 import React, { Component } from "react";
 import Web3 from 'web3';
 import VoteContract from "./contracts/Vote";
-import Addressbar from './Addressbar';
 import NavigationBar from './NavigationBar.js';
-import {Navbar,Nav} from 'react-bootstrap';
-import {Link,BrowserRouter as Router,Switch,Route} from 'react-router-dom';
+import {BrowserRouter as Router,Switch,Route} from 'react-router-dom';
 import CreateNewCandidate from './CreateNewCandidate.js';
 import MyAccount from './MyAccount.js';
 import TestPage from './TestPage.js';
+import ViewCandidates from './ViewCandidates.js'; 
 import "./App.css";
 
 
@@ -27,12 +26,17 @@ class App extends Component {
     this.connectToBlockchain = this.connectToBlockchain.bind(this);
 
     this.changeMyvote = this.changeMyvote.bind(this);
+
     this.createNewCandidate = this.createNewCandidate.bind(this);
-    this.deployShareHold = this.deployShareHold.bind(this);
+    this.viewAllCandidate = this.viewAllCandidate.bind(this);
+
+
+    this.allocateShare = this.allocateShare.bind(this);
     this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
     this.voteForCandidate = this.voteForCandidate.bind(this);
 
     this.getMyInfo = this.getMyInfo.bind(this);
+    this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
 
 
   }
@@ -70,6 +74,7 @@ class App extends Component {
     }
   
   }
+  // the func below call the solidity func
 
   async changeMyvote(candidateId,newVote,voteInfoNum){
     this.setState ({loading: true})
@@ -84,32 +89,56 @@ class App extends Component {
     const myInfo = await this.state.deployedVoteContract.methods.voters(address).call();
     return myInfo;
   }
+
+  //call lookUpVoteRecord()
+  async lookUpVoteRecord(){
+
+    this.state.deployedVoteContract.methods.lookUpVoteRecord().send({from: this.state.account});
+
+    const web3 = window.web3; //first get web3
+    const currentBlockNum = await web3.eth.getBlockTransactionCount("latest");
+    let returnResults;
+    await this.state.deployedVoteContract.getPastEvents('lookUpMyVote',{
+      filter: {myAddr: this.state.account}, 
+      fromBlock: currentBlockNum
+  }, function(error, events){ returnResults = events[0].returnValues;});
+
+   return returnResults;
+  }
+
+  //call createNewCandidate(). For now current time is just a constant. Future direction will change to the real current time
   async createNewCandidate(name,photoURL,candidateInfo){
     this.setState ({loading: true});
-    alert("Now estimate gas amount");
-    //const gasAmount = await this.state.deployedVoteContract.methods.createNewCandidate(name,photoURL,candidateInfo,109).estimateGas({from: this.state.account});// this.state.deployedEthbay is hte contract we access before
-    alert("gas amount OK, start call fun");
+
     this.state.deployedVoteContract.methods.createNewCandidate(name,photoURL,candidateInfo,109).send({from: this.state.account})
     .once('receipt', (receipt)=> {
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
     })
   }
-  async deployShareHold(address,shareHold){
+
+ //call viewAllCandidate(). Can return an array containing item obj
+  async viewAllCandidate(){
+    const totalNumber = await this.state.deployedVoteContract.methods.totalCandidateNumber().call(); 
+    let candidates=[];
+    candidates.length = totalNumber;
+    for (var i = 1;i<= totalNumber;i++) {
+        const candidate = await this.state.deployedVoteContract.methods.candidates(i).call(); // get each items info, item is a mapping(addr => Item)
+        candidates[i] = candidate; // append the item into the existing item array
+    }
+    return candidates;
+  }
+
+ 
+
+  async allocateShare(address,shareHold){
     this.setState ({loading: true});
     alert("gas amount OK, start call fun");
-    this.state.deployedVoteContract.methods.deployShareHold(address,shareHold).send({from: this.state.account})
+    this.state.deployedVoteContract.methods.allocateShare(address,shareHold).send({from: this.state.account})
     .once('receipt', (receipt)=> {
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
     })
   }
-  async lookUpVoteRecord(recordId){
-    this.setState ({loading: true})
-    // will emit event containing the vote record Info
-    this.state.deployedVoteContract.methods.lookUpVoteRecord(recordId).send({from: this.state.account})
-    .once('receipt', (receipt)=> {
-      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
-    })
-  }
+
   async voteForCandidate(candidateId,voteNum){
     this.setState ({loading: true})
     this.state.deployedVoteContract.methods.voteForCandidate(candidateId,voteNum,309).send({from: this.state.account})
@@ -139,10 +168,13 @@ class App extends Component {
                 : 
                 <Switch>
                   <Route path="/createCandidate">
-                    <CreateNewCandidate createNewCandidate={this.createNewCandidate} deployShareHold={this.deployShareHold}/>
+                    <CreateNewCandidate createNewCandidate={this.createNewCandidate} allocateShare={this.allocateShare}/>
                   </Route>
                   <Route path="/myaccount">
-                    <MyAccount getMyInfo={this.getMyInfo} account={this.state.account}/>                  
+                    <MyAccount getMyInfo={this.getMyInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord}/>                  
+                  </Route>
+                  <Route path="/gotovote">
+                    <ViewCandidates viewAllCandidate={this.viewAllCandidate}/>                  
                   </Route>
                   <Route path="/">
                   <TestPage/>   

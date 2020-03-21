@@ -26,7 +26,7 @@ export default class CreateNewCandidate extends Component{
 
    submitShare = event => {
     event.preventDefault();
-    this.props.deployShareHold(this.state.address,this.state.amount);
+    this.props.allocateShare(this.state.address,this.state.amount);
     
     this.setState({address:'',amount:''});
    }
@@ -46,10 +46,12 @@ resetShare=()=>{
 render(){
     return(
       <CardDeck>
-            <Card className="border border-dark bg-light">
+            <Card>
                 <Card.Header><Icon name='plus square' /> Split Share</Card.Header>
-                <Form onReset={this.resetProduct} onSubmit={this.submitShare} id="shareFormId">
+
+                <Form style={{height: '100%'}} onReset={this.resetProduct} onSubmit={this.submitShare} id="shareFormId">
                 <Card.Body>
+                
                     <Form.Row>
                       <Form.Group as={Col} controlId="formGridName">
                         <Form.Label>Account Address</Form.Label>
@@ -71,6 +73,7 @@ render(){
                         className={"bg-light"} placeholder="Enter the amount of stock you want to allocate" />
                       </Form.Group>
                     </Form.Row>
+                   
                 </Card.Body>
                 <Card.Footer style={{"textAlign":"right"}}>
                   <Button size="sm" variant="success" type="submit">
@@ -80,12 +83,14 @@ render(){
                   <Icon name='repeat' /> Reset
                   </Button>
                 </Card.Footer>
-                </Form>
+              </Form>
             </Card>
-            <Card className="border border-dark bg-light">
+
+            <Card>
                 <Card.Header><Icon name='plus square' /> Add Candidate</Card.Header>
                 <Form onReset={this.resetProduct} onSubmit={this.submitCandidate} id="candidateFormId">
                 <Card.Body>
+                
                     <Form.Row>
                       <Form.Group as={Col} controlId="formGridName">
                         <Form.Label>Name</Form.Label>
@@ -118,7 +123,6 @@ render(){
                         className={"bg-light"} placeholder="Enter cadidate Info" />
                       </Form.Group>                   
                     </Form.Row>
-                    
                    
                 </Card.Body>
                 <Card.Footer style={{"textAlign":"right"}}>
