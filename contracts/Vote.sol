@@ -82,7 +82,7 @@ contract Vote {
 // 3. if it's straight voting, then every valid voter can have one vote per share for each nominator
 //    e.g. The voting have 10 candidate, the voting need to select 3 of them to be in board of directors.
 //          Voter Ben has 20 stock thus, he can nominate 3 people, and all these three will have 20 votes
-// 4. if it's cumulative voting, then every voter can have voteNum = stock*maxNominatedNum, and voter can freely distrubute his votes
+// 4. if it's cumulative voting, then every voter can have voteNum = stock * maxNominatedNum, and voter can freely distrubute his votes
 
     constructor(uint256 _addStartDate, uint256 _addEndDate, uint256 _startDate, uint256 _endDate,
                 uint256 _maxNominatedNum, uint256 _totalShareNum, uint256 _maxShareNum, uint _voteType) public {
