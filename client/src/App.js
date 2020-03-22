@@ -7,6 +7,7 @@ import CreateNewCandidate from './CreateNewCandidate.js';
 import MyAccount from './MyAccount.js';
 import TestPage from './TestPage.js';
 import ViewCandidates from './ViewCandidates.js'; 
+import Result from './Result.js';
 import "./App.css";
 
 
@@ -184,6 +185,9 @@ class App extends Component {
                   </Route>
                   <Route path="/gotovote">
                     <ViewCandidates viewAllCandidate={this.viewAllCandidate} voteForCandidate={this.voteForCandidate}/>                  
+                  </Route>
+                  <Route path="/viewresult">
+                    <Result viewAllCandidate={this.viewAllCandidate}/>                  
                   </Route>
                   <Route path="/">
                   <TestPage/>   
