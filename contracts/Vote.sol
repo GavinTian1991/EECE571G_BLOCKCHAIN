@@ -37,15 +37,15 @@ contract Vote {
     }
 
     struct Voter{
-        uint voteTime;              // how many times I have changed my voted
-        uint stock;
+        uint voteChangeNum;              // how many times I have changed my voted
+        uint stock;                 // is share the voter has
         uint totalVoteNum;          // how many votes do I have
         uint voteUsed;              // how many votes do I use
         uint numOfPeopleNominated;  // how many people do I nominate
         mapping (uint => OneVote) myVote; // record for all the nominator I voted
         bool hasVoted;
     }
-    event allocateStock(
+    event allocateShareEvent(
         address voter,
         uint stock
     );
@@ -118,31 +118,26 @@ contract Vote {
     }
     // this func allocate the share to one shareholder, only deployer can call this func
     // the share of one voter should not greater than max share amount that a voter can hold
-    // the currentTotalShareNum+_stockNum should not greater than total share available
-    function allocateShare(address _voterAddr, uint _stockNum) public {
+    // the currentTotalShareNum + _stockNum should not greater than total share available
+    function allocateShare(address _voterAddr, uint _shareNum) public {
         require(msg.sender == voteDeployer, "You can't deploy stock. Only deployer can do this.");
-        require(_stockNum <= maxShareNum, "You can't deploy this stock number for this voter.");
-        require((currentTotalShareNum + _stockNum) <= totalShareNum, "You can't deploy more stock, current stock are greater than total stock.");
+        require(_shareNum <= maxShareNum, "You can't deploy this stock number for this voter.");
+        require((currentTotalShareNum + _shareNum) <= totalShareNum, "You can't deploy more stock, current stock are greater than total stock.");
         // add to currentTotalShareNum
-        currentTotalShareNum = currentTotalShareNum + _stockNum;
+        currentTotalShareNum = currentTotalShareNum + _shareNum;
         Voter memory _voter = voters[_voterAddr];
-        _voter.stock = _stockNum;
-        _voter.totalVoteNum = _stockNum * maxNominatedNum;
-        // if(voteType==1){
-        //     _voter.totalVoteNum = _stockNum;
-        // }else{
-        //     _voter.totalVoteNum = _stockNum*maxNominatedNum;
-        // }
+        _voter.stock = _shareNum;
+        _voter.totalVoteNum = _shareNum * maxNominatedNum;
         voters[_voterAddr] = _voter;
-        emit allocateStock(_voterAddr, _stockNum);
+        emit allocateShareEvent(_voterAddr, _shareNum);
     }
     // this func let voter vote for a candidate
-    //_candidateId: the candidate you want to vote
-    //_voteNum: the number of votes
+    // _candidateId: the candidate you want to vote
+    // _voteNum: the number of votes
     // _currentDate: future direction, the current time is the value returned by JS func:
     // 1.let date = (new Date()).getTime();
     // 2.let currentDate = date / 1000;
-    //basic logic
+    // basic logic
     // current time should be within the voting period
     // if voter has not voted before, then he can vote
     // if numOfPeopleNominated < maxNominatedNum then he can voteForCandidate
@@ -153,22 +148,23 @@ contract Vote {
         require(_currentDate > voteStartDate && _currentDate < voteEndDate,
         "The stage for voting is not valid, no vote can be created");
         require(_candidateId > 0 && _candidateId <= totalCandidateNumber, 'Candidate invalid');
-        require(voters[msg.sender].hasVoted == false || voters[msg.sender].voteTime < 3,
+        require(voters[msg.sender].hasVoted == false || voters[msg.sender].voteChangeNum < 3,
         'You have access your max voting modifying times(3 times)');
         require(voters[msg.sender].stock > 0, "You don't have any stock. You can't vote");
         require(voters[msg.sender].numOfPeopleNominated <= maxNominatedNum, "You can't vote for any more nominator. You can't vote");
         // get the last voting info
         Voter memory _voter = voters[msg.sender];
         // still has votes left?
-        if(voteType==1){
-            require(_voter.voteUsed+voters[msg.sender].stock <= _voter.totalVoteNum, "You don't have so many votes");
+        if(voteType == 1){
+            require(_voter.voteUsed + voters[msg.sender].stock <= _voter.totalVoteNum, "You don't have so many votes");
         }else{
-            require(_voter.voteUsed+_voteNum <= _voter.totalVoteNum, "You don't have so many votes");
+            require(_voter.voteUsed + _voteNum <= _voter.totalVoteNum, "You don't have so many votes");
         }
 
+        // check wether you have voted for this candidates or not
         bool votedForCandidate = false;
-        for(uint i = 0;i <= voters[msg.sender].numOfPeopleNominated; i++){
-            emit lookForInfo(voters[msg.sender].myVote[i].candidateId,_candidateId);
+        for(uint i = 0; i <= voters[msg.sender].numOfPeopleNominated; i++){
+            emit lookForInfo(voters[msg.sender].myVote[i].candidateId, _candidateId);
             if(voters[msg.sender].myVote[i].candidateId == _candidateId){
                 votedForCandidate = true;
              }
@@ -177,29 +173,23 @@ contract Vote {
          // then lets input the new voting info
         voters[msg.sender].numOfPeopleNominated++;
         voters[msg.sender].hasVoted = true;
-        if(voteType==1) {
-            // straight
-            //vote num = stock num
-            OneVote memory myNewVote = OneVote(_candidateId,voters[msg.sender].stock);
-            voters[msg.sender].myVote[_voter.numOfPeopleNominated] = myNewVote;
-            emit newVoteRecord(voters[msg.sender].myVote[_voter.numOfPeopleNominated].candidateId,voters[msg.sender].myVote[_voter.numOfPeopleNominated].voteNum);
-            voters[msg.sender].voteUsed += voters[msg.sender].stock;
-            //voters[msg.sender] = Voter(_voter.voteTime,_voter.stock,_voter.totalVoteNum,_voter.voteUsed,_voter.numOfPeopleNominated,myNewVote,true);
-            Candidate memory _cadidate = candidates[_candidateId];
-            _cadidate.candidateTotalVote += voters[msg.sender].stock;
-            candidates[_candidateId] = _cadidate;
+
+        uint currentVoteNum;
+        if(voteType == 1) {
+            currentVoteNum = voters[msg.sender].stock;
         } else {
-            // cumulative
-            // vote num = _newVote
-            OneVote memory myNewVote = OneVote(_candidateId,_voteNum);
-             voters[msg.sender].voteUsed += _voteNum;
-              voters[msg.sender].myVote[_voter.numOfPeopleNominated] = myNewVote;
-           // voters[msg.sender] = _voter;
-            Candidate memory _cadidate = candidates[_candidateId];
-            _cadidate.candidateTotalVote += _voteNum;
-            candidates[_candidateId] = _cadidate;
+            currentVoteNum = _voteNum;
         }
-        emit vote(_candidateId,_voter.voteTime,_voter.hasVoted);
+        OneVote memory myNewVote = OneVote(_candidateId, currentVoteNum);
+        voters[msg.sender].myVote[_voter.numOfPeopleNominated] = myNewVote;
+        voters[msg.sender].voteUsed += currentVoteNum;
+
+        Candidate memory _cadidate = candidates[_candidateId];
+        _cadidate.candidateTotalVote += currentVoteNum;
+        candidates[_candidateId] = _cadidate;
+
+        emit newVoteRecord(_candidateId, _voteNum);
+        //emit vote(_candidateId, _voter.voteChangeNum, _voter.hasVoted);
     }
     // this func can let you look up all the vote records
     function lookUpVoteRecord() public{
@@ -227,29 +217,30 @@ contract Vote {
     function changeMyVote(uint _candidateId, uint _newVote, uint _voteInfoNum, uint256 _currentDate) public{
         require(_currentDate > voteStartDate && _currentDate < voteEndDate, "The stage for voting is not valid, no vote can be created");
         require(_candidateId > 0 && _candidateId <= totalCandidateNumber, 'Candidate invalid');
-        require(voters[msg.sender].hasVoted == true && voters[msg.sender].voteTime < 3, 'You have access your max voting modifying times(3 times)');
-        require(voters[msg.sender].myVote[_voteInfoNum-1].voteNum > 0, "voting info ID is wrong, you haven't voted for this person");
+        require(voters[msg.sender].hasVoted == true && voters[msg.sender].voteChangeNum < 3,
+        'You have access your max voting modifying times(3 times)');
+        require(voters[msg.sender].myVote[_voteInfoNum - 1].voteNum > 0, "voting info ID is wrong, you haven't voted for this person");
         // get the last voting info
         Voter memory _voter = voters[msg.sender];
-        OneVote memory _voteToModify = voters[msg.sender].myVote[_voteInfoNum-1];
-        emit lookForInfo(_voteToModify.candidateId,_voteToModify.voteNum);
+        OneVote memory _voteToModify = voters[msg.sender].myVote[_voteInfoNum - 1];
+        emit lookForInfo(_voteToModify.candidateId, _voteToModify.voteNum);
         // total voteUsed checking
-        if(voteType==2){
+        if(voteType == 2) {
             uint myLastVoteNum = _voteToModify.voteNum;
-            require(_voter.voteUsed-myLastVoteNum+_newVote <= _voter.totalVoteNum, "You don't have so many votes");
-        }else{
+            require(_voter.voteUsed - myLastVoteNum + _newVote <= _voter.totalVoteNum, "You don't have so many votes");
+        } else {
             // if you have vote for this candidate then don't vote, cuz in type 1 every candidate can only be voted once
-            bool votedForCandidate = false;
-           for(uint i = 0;i <= voters[msg.sender].numOfPeopleNominated;i++){
+           bool votedForCandidate = false;
+           for(uint i = 0; i <= voters[msg.sender].numOfPeopleNominated; i++){
             emit lookForInfo(voters[msg.sender].myVote[i].candidateId,_candidateId);
-            if(voters[msg.sender].myVote[i].candidateId == _candidateId && voters[msg.sender].myVote[i].voteNum > 0){
+            if(voters[msg.sender].myVote[i].candidateId == _candidateId && voters[msg.sender].myVote[i].voteNum > 0) {
                 votedForCandidate = true;
              }
-              require(!votedForCandidate,"You have voted for this candidate.");
+             require(!votedForCandidate, "You have voted for this candidate.");
             }
         }
         // now start to modify
-        voters[msg.sender].voteTime++;
+        voters[msg.sender].voteChangeNum++;
         // last candidate I vote
         Candidate memory _lastVoteCadidate = candidates[_voteToModify.candidateId];
          // retrieve the voteNumUsed and the candidate voteNum
@@ -257,24 +248,17 @@ contract Vote {
          candidates[_voteToModify.candidateId] = _lastVoteCadidate;
          voters[msg.sender].voteUsed -= _voteToModify.voteNum;
          // now input the new vote info
-        if(voteType==1){
-            // straight
-            //vote num = stock num
-            OneVote memory myNewVote = OneVote(_candidateId,voters[msg.sender].stock);
-            voters[msg.sender].voteUsed += voters[msg.sender].stock;
-            voters[msg.sender].myVote[_voteInfoNum-1] = myNewVote;
-            Candidate memory _cadidate = candidates[_candidateId];
-            _cadidate.candidateTotalVote += voters[msg.sender].stock;
-            candidates[_candidateId] = _cadidate;
-        }else{
-            // cumulative
-            // vote num = _newVote
-            OneVote memory myNewVote = OneVote(_candidateId,_newVote);
-            voters[msg.sender].voteUsed += _newVote;
-            voters[msg.sender].myVote[_voteInfoNum-1] = myNewVote;
-            Candidate memory _cadidate = candidates[_candidateId];
-            _cadidate.candidateTotalVote += _newVote;
-            candidates[_candidateId] = _cadidate;
+        uint currentVoteNum;
+        if(voteType == 1) {
+            currentVoteNum = voters[msg.sender].stock;
+        } else {
+            currentVoteNum = _newVote;
         }
+        OneVote memory myNewVote = OneVote(_candidateId, currentVoteNum);
+        voters[msg.sender].voteUsed += currentVoteNum;
+        voters[msg.sender].myVote[_voteInfoNum - 1] = myNewVote;
+        Candidate memory _cadidate = candidates[_candidateId];
+        _cadidate.candidateTotalVote += currentVoteNum;
+        candidates[_candidateId] = _cadidate;
     }
 }
