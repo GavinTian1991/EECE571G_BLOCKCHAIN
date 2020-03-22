@@ -50,6 +50,7 @@ export default class ViewCandidates extends Component{
                                          <ListGroup className="list-group-flush">
                                             <ListGroupItem>{candidate.candidateInfo}</ListGroupItem>
                                             <ListGroupItem>Total Votes: {candidate.candidateTotalVote}</ListGroupItem>
+                                            <ListGroupItem>Candidate ID: {candidate.candidateId}</ListGroupItem>
                                         </ListGroup>
 
                                         <Form onSubmit={this.voteForCandidate(candidate.candidateId)} style={{ margin: '40px' }}>

@@ -25,7 +25,7 @@ class App extends Component {
     this.getWeb3Provider = this.getWeb3Provider.bind(this);
     this.connectToBlockchain = this.connectToBlockchain.bind(this);
 
-    this.changeMyvote = this.changeMyvote.bind(this);
+    this.changeMyVote = this.changeMyVote.bind(this);
 
     this.createNewCandidate = this.createNewCandidate.bind(this);
     this.viewAllCandidate = this.viewAllCandidate.bind(this);
@@ -76,9 +76,9 @@ class App extends Component {
   }
   // the func below call the solidity func
 
-  async changeMyvote(candidateId,newVote,voteInfoNum){
+  async changeMyVote(candidateId,newVote,voteInfoNum){
     this.setState ({loading: true})
-   this.state.deployedVoteContract.methods.changeMyvote(candidateId,newVote,voteInfoNum,309).send({from: this.state.account})
+    this.state.deployedVoteContract.methods.changeMyVote(candidateId,newVote,voteInfoNum,309).send({from: this.state.account})
     .once('receipt', (receipt)=> {
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
     })
@@ -96,12 +96,19 @@ class App extends Component {
     this.state.deployedVoteContract.methods.lookUpVoteRecord().send({from: this.state.account});
 
     const web3 = window.web3; //first get web3
-    const currentBlockNum = await web3.eth.getBlockTransactionCount("latest");
+    //const currentBlockNum = await web3.eth.getBlockTransactionCount("latest");
     let returnResults;
     await this.state.deployedVoteContract.getPastEvents('lookUpMyVote',{
       filter: {myAddr: this.state.account}, 
-      fromBlock: currentBlockNum
-  }, function(error, events){ returnResults = events[0].returnValues;});
+      fromBlock: 'latest'
+  }, function(error, events){ 
+    
+    returnResults = events[0].returnValues;
+    console.log(events);
+  }).then(function(events){
+    //alert("current block num: "+currentBlockNum+ "show func return result:" + events[0].returnValues.candidateID[0]);
+    //returnResults = events[0].returnValues;
+  });
 
    return returnResults;
   }
@@ -147,6 +154,8 @@ class App extends Component {
     })
   }
 
+
+
  
   
   render() {
@@ -171,7 +180,7 @@ class App extends Component {
                     <CreateNewCandidate createNewCandidate={this.createNewCandidate} allocateShare={this.allocateShare}/>
                   </Route>
                   <Route path="/myaccount">
-                    <MyAccount getMyInfo={this.getMyInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord}/>                  
+                    <MyAccount getMyInfo={this.getMyInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord} changeMyVote={this.changeMyVote}/>                  
                   </Route>
                   <Route path="/gotovote">
                     <ViewCandidates viewAllCandidate={this.viewAllCandidate} voteForCandidate={this.voteForCandidate}/>                  
