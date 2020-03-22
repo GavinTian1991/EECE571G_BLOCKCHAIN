@@ -58,28 +58,28 @@ contract("Vote Test", async accounts => {
         it('create a candidate with incomplete information', async () => {
             //invalid candidate name
             try{
-                await await vote.createNewCandidate('', 'https://KB.jpg', 'Basketball player', 150, {from: accounts[0]});
+                await vote.createNewCandidate('', 'https://KB.jpg', 'Basketball player', 150, {from: accounts[0]});
              }catch(error){
                  assert.equal(error.message.includes('candidate name is required'), true);
              }  
 
              //invalid candiate info
              try{
-                await await vote.createNewCandidate('Kobe Bryant', 'https://KB.jpg', '', 150, {from: accounts[0]});
+                await vote.createNewCandidate('Kobe Bryant', 'https://KB.jpg', '', 150, {from: accounts[0]});
              }catch(error){
                  assert.equal(error.message.includes('candidate info is required'), true);
              } 
 
              //invalid add deployer address
              try{
-                await await vote.createNewCandidate('Kobe Bryant', 'https://KB.jpg', '', 150, {from: accounts[1]});
+                await vote.createNewCandidate('Kobe Bryant', 'https://KB.jpg', '', 150, {from: accounts[1]});
              }catch(error){
                  assert.equal(error.message.includes("You can't create new cadidate. Only deployer can do this."), true);
              } 
 
              //invalid create time
              try{
-                await await vote.createNewCandidate('Kobe Bryant', 'https://KB.jpg', 'Basketball player', 300, {from: accounts[0]});
+                await vote.createNewCandidate('Kobe Bryant', 'https://KB.jpg', 'Basketball player', 300, {from: accounts[0]});
              }catch(error){
                  assert.equal(error.message.includes("The stage for adding new candiddate is not valid, no candidate can be added"), true);
              } 
@@ -116,6 +116,40 @@ contract("Vote Test", async accounts => {
                 assert.equal(error.message.includes("You can't deploy more stock, current stock are greater than total stock."), true);
             } 
         });
-    })
+    });
+
+    describe('vote for candidates', async () => {
+        it('valid vote for candidates under straght voting', async () => {
+            let result3 = await vote.voteForCandidate(1, 10, 350, {from: accounts[1]});
+            let event3 = result3.logs[0].args;  //[0]: look up event
+            let voter = await vote.voters(accounts[1]);
+            let candidate = await vote.candidates(1);
+
+            assert.equal(voter.numOfPeopleNominated.toNumber(), 1);
+            assert.equal(voter.hasVoted, true);
+            assert.equal(voter.voteUsed.toNumber(), 50);
+            assert.equal(candidate.candidateTotalVote.toNumber(), 50);
+
+            assert.equal(event3.candidateId.toNumber(), 1);
+            assert.equal(event3.voteNum.toNumber(), 50);
+        });
+    });
+
+    describe('change candidate vote', async () => {
+        it('change exsiting voting', async () => {
+            await vote.createNewCandidate('Michael Jordan', 'https://MJ.jpg', 'NBA Basketball player', 150, {from: accounts[0]});
+            let result4 = await vote.changeMyVote(2, 10, 1, 350, {from: accounts[1]});
+            let event4 = result4.logs[0].args; 
+            let voter = await vote.voters(accounts[1]);
+            let candidate1 = await vote.candidates(1);
+            let candidate2 = await vote.candidates(2);
+
+            assert.equal(event4.candidateId.toNumber(), 2);
+            assert.equal(event4.voteNum.toNumber(), 50);
+            assert.equal(candidate1.candidateTotalVote.toNumber(), 0);
+            assert.equal(candidate2.candidateTotalVote.toNumber(), 50);
+            assert.equal(voter.voteChangeNum.toNumber(), 1);
+        });
+    });
 
 });

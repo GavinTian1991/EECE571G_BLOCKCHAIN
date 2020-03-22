@@ -37,7 +37,7 @@ contract Vote {
     }
 
     struct Voter{
-        uint voteChangeNum;              // how many times I have changed my voted
+        uint voteChangeNum;         // how many times I have changed my voted
         uint stock;                 // is share the voter has
         uint totalVoteNum;          // how many votes do I have
         uint voteUsed;              // how many votes do I use
@@ -50,6 +50,10 @@ contract Vote {
         uint stock
     );
     event newVoteRecord(
+        uint candidateId,
+        uint voteNum
+    );
+    event changeVoteRecord(
         uint candidateId,
         uint voteNum
     );
@@ -164,32 +168,31 @@ contract Vote {
         // check wether you have voted for this candidates or not
         bool votedForCandidate = false;
         for(uint i = 0; i <= voters[msg.sender].numOfPeopleNominated; i++){
-            emit lookForInfo(voters[msg.sender].myVote[i].candidateId, _candidateId);
+            //emit lookForInfo(voters[msg.sender].myVote[i].candidateId, _candidateId);
             if(voters[msg.sender].myVote[i].candidateId == _candidateId){
                 votedForCandidate = true;
              }
         }
-        require(!votedForCandidate, "You have voted for this candidate. If you want to change, then use changeMyVote()");
+        require(!votedForCandidate,
+            "You have voted for this candidate, use changeMyVote() to change your vote");
          // then lets input the new voting info
         voters[msg.sender].numOfPeopleNominated++;
         voters[msg.sender].hasVoted = true;
-
-        uint currentVoteNum;
+        uint currentVoteStock;
         if(voteType == 1) {
-            currentVoteNum = voters[msg.sender].stock;
+            currentVoteStock = voters[msg.sender].stock;
         } else {
-            currentVoteNum = _voteNum;
+            currentVoteStock = _voteNum;
         }
-        OneVote memory myNewVote = OneVote(_candidateId, currentVoteNum);
+        OneVote memory myNewVote = OneVote(_candidateId, currentVoteStock);
         voters[msg.sender].myVote[_voter.numOfPeopleNominated] = myNewVote;
-        voters[msg.sender].voteUsed += currentVoteNum;
+        voters[msg.sender].voteUsed += currentVoteStock;
 
         Candidate memory _cadidate = candidates[_candidateId];
-        _cadidate.candidateTotalVote += currentVoteNum;
+        _cadidate.candidateTotalVote += currentVoteStock;
         candidates[_candidateId] = _cadidate;
 
-        emit newVoteRecord(_candidateId, _voteNum);
-        //emit vote(_candidateId, _voter.voteChangeNum, _voter.hasVoted);
+        emit newVoteRecord(_candidateId, currentVoteStock);
     }
     // this func can let you look up all the vote records
     function lookUpVoteRecord() public{
@@ -223,7 +226,7 @@ contract Vote {
         // get the last voting info
         Voter memory _voter = voters[msg.sender];
         OneVote memory _voteToModify = voters[msg.sender].myVote[_voteInfoNum - 1];
-        emit lookForInfo(_voteToModify.candidateId, _voteToModify.voteNum);
+        // emit lookForInfo(_voteToModify.candidateId, _voteToModify.voteNum);
         // total voteUsed checking
         if(voteType == 2) {
             uint myLastVoteNum = _voteToModify.voteNum;
@@ -232,7 +235,7 @@ contract Vote {
             // if you have vote for this candidate then don't vote, cuz in type 1 every candidate can only be voted once
            bool votedForCandidate = false;
            for(uint i = 0; i <= voters[msg.sender].numOfPeopleNominated; i++){
-            emit lookForInfo(voters[msg.sender].myVote[i].candidateId,_candidateId);
+            //emit lookForInfo(voters[msg.sender].myVote[i].candidateId,_candidateId);
             if(voters[msg.sender].myVote[i].candidateId == _candidateId && voters[msg.sender].myVote[i].voteNum > 0) {
                 votedForCandidate = true;
              }
@@ -260,5 +263,6 @@ contract Vote {
         Candidate memory _cadidate = candidates[_candidateId];
         _cadidate.candidateTotalVote += currentVoteNum;
         candidates[_candidateId] = _cadidate;
+        emit changeVoteRecord(_candidateId, currentVoteNum);
     }
 }
