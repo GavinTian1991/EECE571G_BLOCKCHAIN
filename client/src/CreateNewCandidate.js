@@ -49,9 +49,9 @@ render(){
             <Card>
                 <Card.Header><Icon name='plus square' /> Split Share</Card.Header>
 
-                <Form style={{height: '100%'}} onReset={this.resetProduct} onSubmit={this.submitShare} id="shareFormId">
-                <Card.Body>
                 
+                <Card.Body>
+                <Form style={{height: '100%'}} onReset={this.resetProduct} onSubmit={this.submitShare} id="shareFormId">
                     <Form.Row>
                       <Form.Group as={Col} controlId="formGridName">
                         <Form.Label>Account Address</Form.Label>
@@ -73,17 +73,18 @@ render(){
                         className={"bg-light"} placeholder="Enter the amount of stock you want to allocate" />
                       </Form.Group>
                     </Form.Row>
-                   
-                </Card.Body>
-                <Card.Footer style={{"textAlign":"right"}}>
-                  <Button size="sm" variant="success" type="submit">
+                    <Button size="sm" variant="success" type="submit">
                   <Icon name='save' /> Submit
                   </Button>{" "}
                   <Button size="sm" variant="info" type="reset">
                   <Icon name='repeat' /> Reset
                   </Button>
+                  </Form> 
+                </Card.Body>
+                <Card.Footer style={{"textAlign":"right"}}>
+                  
                 </Card.Footer>
-              </Form>
+              
             </Card>
 
             <Card>

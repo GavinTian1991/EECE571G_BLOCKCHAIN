@@ -174,7 +174,7 @@ class App extends Component {
                     <MyAccount getMyInfo={this.getMyInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord}/>                  
                   </Route>
                   <Route path="/gotovote">
-                    <ViewCandidates viewAllCandidate={this.viewAllCandidate}/>                  
+                    <ViewCandidates viewAllCandidate={this.viewAllCandidate} voteForCandidate={this.voteForCandidate}/>                  
                   </Route>
                   <Route path="/">
                   <TestPage/>   
