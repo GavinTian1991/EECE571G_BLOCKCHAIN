@@ -159,9 +159,6 @@ class App extends Component {
         {"Your Address: " + this.state.account}
         
         </div>
-        
-          
-            
               { this.state.loading 
                 ? 
                   <div><p className="text-center">Loading ...</p></div> 
@@ -181,9 +178,6 @@ class App extends Component {
                   </Route>
                 </Switch>
                   }
-            
-          
-        
       </div>
       </Router>
     );

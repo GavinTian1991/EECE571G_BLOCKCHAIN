@@ -109,7 +109,7 @@ contract Vote {
         require(_currentDate > addCandidateStartDate && _currentDate < addCandidateEndDate,
                 "The stage for adding new candiddate is not valid, no candidate can be added");
         require(bytes(_cadidateName).length > 0, "candidate name is required");
-        require(bytes(_cadidateInfo).length > 0, "candidate Info is required");
+        require(bytes(_cadidateInfo).length > 0, "candidate info is required");
         totalCandidateNumber++;
         string memory photo = "https://en.wikipedia.org/wiki/Anonymous_(group)#/media/File:Anonymous_emblem.svg";
         if(bytes(_candidatePhoto).length > 0){photo = _candidatePhoto;}

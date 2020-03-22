@@ -42,4 +42,48 @@ contract("Vote Test", async accounts => {
         });
     });
 
+
+    describe('create candidates in contract', async () => {
+        it('create a candidate with complete information', async () => {
+            let result1 = await vote.createNewCandidate('Kobe Bryant', 'https://KB.jpg', 'Basketball player', 150,{from: accounts[0]});
+            let totalCandidateNumber = await vote.totalCandidateNumber();
+            let event1 = result1.logs[0].args;
+            assert.equal(event1.candidateId.toNumber(), totalCandidateNumber.toNumber(), 'Candidate id is correct');
+            assert.equal(event1.candidateName, 'Kobe Bryant','Candidate name is correct');
+            assert.equal(event1.candidatePhoto, 'https://KB.jpg','Candidate photo url is correct');
+            assert.equal(event1.candidateInfo, 'Basketball player','Candidate info is correct');
+            assert.equal(event1.candidateTotalVote.toNumber(), 0,'Candidate vote number is correct');
+        });
+
+        it('create a candidate with incomplete information', async () => {
+            //invalid candidate name
+            try{
+                await await vote.createNewCandidate('', 'https://KB.jpg', 'Basketball player', 150, {from: accounts[0]});
+             }catch(error){
+                 assert.equal(error.message.includes('candidate name is required'), true);
+             }  
+
+             //invalid candiate info
+             try{
+                await await vote.createNewCandidate('Kobe Bryant', 'https://KB.jpg', '', 150, {from: accounts[0]});
+             }catch(error){
+                 assert.equal(error.message.includes('candidate info is required'), true);
+             } 
+
+             //invalid add deployer address
+             try{
+                await await vote.createNewCandidate('Kobe Bryant', 'https://KB.jpg', '', 150, {from: accounts[1]});
+             }catch(error){
+                 assert.equal(error.message.includes("You can't create new cadidate. Only deployer can do this."), true);
+             } 
+
+             //invalid create time
+             try{
+                await await vote.createNewCandidate('Kobe Bryant', 'https://KB.jpg', 'Basketball player', 300, {from: accounts[0]});
+             }catch(error){
+                 assert.equal(error.message.includes("The stage for adding new candiddate is not valid, no candidate can be added"), true);
+             } 
+        });
+    });
+
 });
