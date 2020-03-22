@@ -41,7 +41,7 @@ contract Vote {
         uint stock;
         uint totalVoteNum;          // how many votes do I have
         uint voteUsed;              // how many votes do I use
-        uint numOfPeopleNominated;  //  how many people do I nominate
+        uint numOfPeopleNominated;  // how many people do I nominate
         mapping (uint => OneVote) myVote; // record for all the nominator I voted
         bool hasVoted;
     }
@@ -119,22 +119,22 @@ contract Vote {
     // this func allocate the share to one shareholder, only deployer can call this func
     // the share of one voter should not greater than max share amount that a voter can hold
     // the currentTotalShareNum+_stockNum should not greater than total share available
-    function allocateShare(address _voterAddr, uint _stockNum) public{
-        require(msg.sender == voteDeployer, "You can't deploy stock.Only deployer can do this.");
-        require(_stockNum <= maxShareNum, "You can't deploy this many stock for this voter.");
-        require((currentTotalShareNum+_stockNum) <= totalShareNum, "You can't deploy more stock, current stock are greater than total stock.");
+    function allocateShare(address _voterAddr, uint _stockNum) public {
+        require(msg.sender == voteDeployer, "You can't deploy stock. Only deployer can do this.");
+        require(_stockNum <= maxShareNum, "You can't deploy this stock number for this voter.");
+        require((currentTotalShareNum + _stockNum) <= totalShareNum, "You can't deploy more stock, current stock are greater than total stock.");
         // add to currentTotalShareNum
-        currentTotalShareNum = currentTotalShareNum+_stockNum;
+        currentTotalShareNum = currentTotalShareNum + _stockNum;
         Voter memory _voter = voters[_voterAddr];
         _voter.stock = _stockNum;
-        _voter.totalVoteNum = _stockNum*maxNominatedNum;
+        _voter.totalVoteNum = _stockNum * maxNominatedNum;
         // if(voteType==1){
         //     _voter.totalVoteNum = _stockNum;
         // }else{
         //     _voter.totalVoteNum = _stockNum*maxNominatedNum;
         // }
         voters[_voterAddr] = _voter;
-        emit allocateStock(_voterAddr,_stockNum);
+        emit allocateStock(_voterAddr, _stockNum);
     }
     // this func let voter vote for a candidate
     //_candidateId: the candidate you want to vote

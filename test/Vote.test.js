@@ -86,4 +86,36 @@ contract("Vote Test", async accounts => {
         });
     });
 
+    describe('allocate share in contract', async () => {
+        it('allocate share to specific address', async () => {
+            let result2 = await vote.allocateShare(accounts[1], 10, {from: accounts[0]});
+            let event2 = result2.logs[0].args;
+            let address = event2.voter;
+            assert.equal(address, accounts[1]);
+            assert.equal(event2.stock.toNumber(), 10);
+
+            let voter = await vote.voters(address);
+            let maxNominatedNum = await vote.maxNominatedNum();
+            assert.equal(voter.stock.toNumber(), 10);
+            assert.equal(voter.totalVoteNum.toNumber(), 10 * maxNominatedNum.toNumber());
+        });
+
+        it('allocate share with invalid inputs', async () => {
+            //invalid deployer address
+            try{
+                await vote.allocateShare(accounts[1], 10, {from: accounts[1]});
+            }catch(error){
+                assert.equal(error.message.includes("You can't deploy stock. Only deployer can do this."), true);
+            }
+
+            //invalid deployer address
+            try{
+                await vote.allocateShare(accounts[1], 50, {from: accounts[0]});
+                await vote.allocateShare(accounts[1], 45, {from: accounts[0]});
+            }catch(error){
+                assert.equal(error.message.includes("You can't deploy more stock, current stock are greater than total stock."), true);
+            } 
+        });
+    })
+
 });
