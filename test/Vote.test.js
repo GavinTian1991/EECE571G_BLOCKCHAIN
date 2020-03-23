@@ -257,5 +257,4 @@ contract("Vote Test", async accounts => {
             }
         });
     });
-
 });
