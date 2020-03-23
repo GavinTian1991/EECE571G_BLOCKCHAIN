@@ -1,17 +1,31 @@
 import React, { Component } from "react";
-import {Card,Form, Button,CardColumns,ListGroup,ListGroupItem} from 'react-bootstrap';
+import {Card,Form, Button,CardColumns,ListGroup,ListGroupItem,Row,Col} from 'react-bootstrap';
 import { Icon } from 'semantic-ui-react';
 
 export default class ViewCandidates extends Component{
     constructor(props){
         super(props);
         this.state={candidates:[]};
+        this.voteForCandidate = this.voteForCandidate.bind(this);
+        this.infoChange = this.infoChange.bind(this);
     }
 
     async componentDidMount(){
         const candidates = await this.props.viewAllCandidate();
         await this.setState({candidates});
-        alert(candidates.length);
+    }
+
+    infoChange = event =>{
+        this.setState({
+            [event.target.name]:event.target.value
+        });}
+
+    voteForCandidate(inputID){
+        return event => {
+            event.preventDefault();
+            this.props.voteForCandidate(inputID,this.state.voteNumInput);
+            //alert("id: "+inputID+"vote: "+ this.state.voteNumInput);
+        }
     }
 
     render(){
@@ -35,13 +49,31 @@ export default class ViewCandidates extends Component{
                                          <Card.Title>{candidate.candidateName}</Card.Title>
                                          <ListGroup className="list-group-flush">
                                             <ListGroupItem>{candidate.candidateInfo}</ListGroupItem>
-                                            <ListGroupItem>{candidate.candidateTotalVote}</ListGroupItem>
+                                            <ListGroupItem>Total Votes: {candidate.candidateTotalVote}</ListGroupItem>
+                                            <ListGroupItem>Candidate ID: {candidate.candidateId}</ListGroupItem>
                                         </ListGroup>
+
+                                        <Form onSubmit={this.voteForCandidate(candidate.candidateId)} style={{ margin: '40px' }}>
+                                        <Form.Group as={Row} controlId="formGridName">
+                                        {/* <input type="hidden" name="voteIDInput" onChange={this.infoChange} value={candidate.candidateId}/> */}
+                                        
+                                            <Form.Label>Votes:</Form.Label>
+                                            <Col>
+                                            <Form.Control required autoComplete="off"
+                                                type="text" 
+                                                name="voteNumInput"
+                                                onChange={this.infoChange}
+                                                className={"bg-light"} 
+                                                placeholder="Enter the Number of votes" />
+                                            </Col>
+                                        </Form.Group>
+                                        <Button onClick={this.voteForCandidate}  variant="secondary" type="submit">
+                                                <Icon name='hand paper outline'/> Vote
+                                        </Button>
+                                        </Form>
                                         </Card.Body>
                                         <Card.Footer>
-                                            <Button variant="secondary">
-                                                    <Icon name='hand paper outline' /> Vote
-                                            </Button>
+
                                         </Card.Footer>
                                       </Card>
                                       );
