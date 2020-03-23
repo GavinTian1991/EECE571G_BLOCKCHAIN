@@ -1,22 +1,35 @@
-# Blockchain Global Voting System
+# Blockchain Global Voting System V_1.0
+
+# Group TBD
+
+-   XIAOJUN TIAN 11240587
+-   LIMING LIU 95660163
+-   YUEWEI LUO 14152342
+-   JIAHAO 50462670
 
 ## Introduction
 
 From the US presidential election to student association resolution, voting is a common but indispensable activity in our daily life. However, the traditional voting systems, either on-site or online, always have some disadvantages because of their natural form and restrictions using traditional technologies. In this project, we designed the smart contract and implemented a voting system using blockchain technology. By applying the two most important features, cryptography and decentralization, the security and reliability of the voting process is guaranteed.
 
-## Disadvantages of Traditional On-Site Voting
+### Disadvantages of Traditional On-Site Voting
 
 -   People need to go to the voting polls in person and wait in a long line. (Persidential Election)
 -   Impossible to alter vote before the deadline if the voters change their mind.
 -   Hackers can apply malicious attack the back-end server/database and manipulate the results.
 
-## Advantages of Online Voting through Blockchain
+### Advantages of Online Voting through Blockchain
 
 -   The voting results are outgiving and immutable.
+
 -   The decentralized network can help prevent malicious attack.
+
 -   People can vote anywhere where the Internet is accessible.
+
 -   People have the authority to alter their vote before the deadline in case that they change their mind.
+
 -   Real-time voting results are always visible to everyone.
+
+    
 
 ## Objectives
 
@@ -36,6 +49,7 @@ Inquire allows users to check and change their decision. The voting result is al
 
 Results show the real-time vote rate of each candidate in the form of a histogram.
 
+
 ### Intermediate Functions
 
 #### Candidate Creation
@@ -46,6 +60,8 @@ A candidate is created by filling in name and other information, as well as a ti
 
 A voting deadline is a reference to indicate that all the voters made after the deadline will be declined.
 
+
+
 ### Advanced Functions
 
 #### New Voting Creation
@@ -54,9 +70,41 @@ This functionality allows proposing a new voting. It can set the name of this vo
 
 
 
+### Flow Chart
+
+
+
 ![image-20200322113059007](/Users/lijiahao/Library/Application Support/typora-user-images/image-20200322113059007.png)
 
+
+
 ## Application Wireframe
+
+### Main Voting Page
+
+![img](https://lh6.googleusercontent.com/um_0-lgrPLwGHBDucHy5WAuf2G-EaAxkPDbWNK95nXEA5Z3vNL3tBb2Kb9H8-iAMLlTFGwLzICpUa9-bBMhTyVbaqYCKEb_IX1N7yp6-xeqng8N9RbbrfmeU-FezYhgfzCxfdZ2Z)
+
+Users can learn about nominator information (photo, name, and description) and vote for their candidates.
+
+### Result Page
+
+![img](https://lh5.googleusercontent.com/RhoYE_pdFRfJJYg1ae04Ec766gFipLEGHl7Z0n7-GTnd5gov3u_AGyqdLzVD7UkoP5b2lfN0yBcdGmCKnSBTSB2Gn1PXmgYyrHmVu9y5IHyjf4Lfj24dD8BDhs5JwfJfU_0p1Vkn)
+
+Users can see the real-time vote rate and the results of the final vote.
+
+### Account Page
+
+![img](https://lh4.googleusercontent.com/yuedfym1p5DXV1RVr9dNB4E_FOeI3xqgYbY7G6g6swAWjQqbUytaNexjn456kF_iQ5cEeE12LFyrQ6iJjkYWhE7nApvPASVa27HjlE8ZjNsqEWEPHKYJYLcwQxTWRfpEz4LGiwTf)
+
+Users and check information about their account such as the number of votes remaining (out of 3). Users can also learn the detailed voting history.
+
+### Setting Page
+
+![img](https://lh3.googleusercontent.com/64QnWwO8dWN_suNot4jLkBrvU-B670NS3yeHO5t-9S5AnWfSl8QcPIyTLQxWX2oMvyXUrkwAawVk9dotv46TL7sokvyHbQjQ027gj_ZIYETvn0x_KQtHkiM3WCXufOKooetITN7t)
+
+The contract owner can split the share amount with other users. The contract owner can also add the candidate to the voting system. This page can help the contract owner better manage the whole voting system.
+
+
 
 ## Smart Contract
 
@@ -343,6 +391,8 @@ contract Vote {
 }
 ```
 
+
+
 ## Testing
 
 ```javascript
@@ -436,6 +486,8 @@ contract("Vote Test", async accounts => {
 
 });
 ```
+
+
 
 ## Testing Result
 
