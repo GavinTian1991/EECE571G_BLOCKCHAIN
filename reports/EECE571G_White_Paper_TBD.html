@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Blockchain Global Voting System</title>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+        
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        
+        
+    </head>
+    <body class="vscode-light">
+        <h1 id="blockchain-global-voting-system">Blockchain Global Voting System</h1>
+<h1 id="group-tbd">Group TBD.</h1>
+<ul>
+<li>XIAOJUN TIAN 11240587</li>
+<li>LIMING LIU 95660163</li>
+<li>YUEWEI LUO 14152342</li>
+<li>JIAHAO LI 50462670</li>
+</ul>
+<h2 id="introduction">Introduction</h2>
+<p>From the US presidential election to student association resolution, voting is a common but indispensable activity in our daily life. However, the traditional voting systems, either on-site or online, always have some disadvantages because of their natural form and restrictions using traditional technologies. In this project, we designed the smart contract and implemented a voting system using blockchain technology. By applying the two most important features, cryptography and decentralization, the security and reliability of the voting process is guaranteed.</p>
+<h3 id="disadvantages-of-traditional-on-site-voting">Disadvantages of traditional on-site voting</h3>
+<ul>
+<li>People need to go to the voting polls in person and wait in a long line (Persidential Election)</li>
+<li>Impossible to alter vote before the deadline if the voters change their mind</li>
+<li>Hackers can apply malicious attack the back-end server/database and manipulate the results</li>
+</ul>
+<h3 id="advantages-of-online-voting-through-blockchain">Advantages of online voting through Blockchain</h3>
+<ul>
+<li>The voting results are public and immutable</li>
+<li>The decentralized network can help prevent malicious attack</li>
+<li>People can vote anywhere where the Internet is accessible</li>
+<li>People have the authority to alter their vote before the deadline in case that they change their mind</li>
+<li>Real-time voting results are always visible to everyone</li>
+</ul>
+<h2 id="objectives">Objectives</h2>
+<p>The functionalities of our voting system are divided into 3 parts, from basic to advanced based on the importance of these functions to the system. Some of the advanced functionalies may not be able to finish before the deadline but we guarantee that all the basic and itermediate functions will be implemented.</p>
+<h3 id="basic-functions">Basic Functions</h3>
+<h4 id="vote">Vote</h4>
+<p>There are two kinds of voting - straight and cumulative. In the straight voting, each voter can have one vote per share for each nominator. In other words, voters only need to select the candidates they intend to vote for, the votes for each candidate are fixed. In cumulative voting, each voter can vote candidates they want to vote with different votes number. There are several constraints on voting. For example, the voter should always vote before the deadline and should have never voted before. Besides, the candidates should be valid as well.</p>
+<h4 id="inquire">Inquire</h4>
+<p>Under Inquire, firstly, voters can check their account share details which includes: Total share, Total Votes, Votes Used, Available Votes, Number of voted Candidates , Remaining Times to Modify My Vote(MAX 3 times); Secondly, voter can see their current votes record;
+Thirdly, voter can change their previous votes based on their votes record, however, the maximum time of change votes is 3. Also, only the voter has the authority to change the votes, others do not have right to modify record. The security and authority is guaranteed by the blockchain.</p>
+<h4 id="results">Results</h4>
+<p>Results show the real-time vote results of each candidate in the form of a histogram.</p>
+<h3 id="intermediate-functions">Intermediate Functions</h3>
+<h4 id="candidate-creation">Candidate Creation</h4>
+<p>A candidate can be created by candidate name, personal photo url and personal information.</p>
+<h4 id="share-allocation">Share Allocation</h4>
+<p>Only deployer can allocate specific shares to each vote through their account address which can not exceed the total share.</p>
+<h3 id="advanced-functions">Advanced Functions</h3>
+<h4 id="voting-deadline">Voting Deadline</h4>
+<p>A voting deadline is a reference to indicate that all the voters made after the deadline will be declined. However, time setting is always a tough part in solidity. Therefore, we put voting dealine setting function in the advanced part.</p>
+<h4 id="multi-voting-choices">Multi Voting Choices</h4>
+<p>Multi votings with different purposes can be set and stored in the blockchain which can be switched between each other in the front-end.</p>
+<h2 id="application-wireframe">Application Wireframe</h2>
+<p>At the beginning, we can see our application wireframe level below based on our functions needs:</p>
+<figure class="image">
+<img src="file:////Users/xiaojuntian/UBC/EECE571G_BLOCKCHAIN/reports/images/Function Diagram.jpg"/>
+<figcaption> Figure 1. Wireframe level</figcaption>
+</figure> 
+<h3 id="voting-application-main-page">Voting application main page</h3>
+<figure class="image">
+<img src="file:////Users/xiaojuntian/UBC/EECE571G_BLOCKCHAIN/reports/images/main.png"/>
+<figcaption> Figure 2. Main Interface</figcaption>
+</figure>  
+<p>The main interface page contains greeting information, also your current account address, the account address information will consistent within other pages.</p>
+<h3 id="vote-page">Vote page</h3>
+<figure class="image">
+<img src="file:////Users/xiaojuntian/UBC/EECE571G_BLOCKCHAIN/reports/images/VoteAfter.png"/>
+<figcaption> Figure 3. Vote Page</figcaption>
+</figure>  
+<p>Candidate related information like: name, personal photo and introduction and current votes number. Voter can vote for candididate by inputing the number of votes and clicking vote button.</p>
+<h3 id="result-page">Result Page</h3>
+<div style="align: center">
+    <figure class="image">
+    <img src="file:////Users/xiaojuntian/UBC/EECE571G_BLOCKCHAIN/reports/images/ResultAfterVote.png" />
+    <figcaption> Figure 4. Results Page</figcaption>
+    </figure>  
+</div>
+<p>Voter can see the current votes results any time they want to see. The results shown in a histogram.</p>
+<h3 id="account-page">Account page</h3>
+<figure class="image">
+<img src="file:////Users/xiaojuntian/UBC/EECE571G_BLOCKCHAIN/reports/images/AccountAfterShare.png"/>
+<figcaption> Figure 5. Account Page</figcaption>
+</figure>  
+<p>We have 3 sections under this page which are: account details, voter's current vote record and change vote.</p>
+<h3 id="vote-setting-page">Vote setting page</h3>
+<figure class="image">
+<img src="file:////Users/xiaojuntian/UBC/EECE571G_BLOCKCHAIN/reports/images/Acount Setting.png"/>
+<figcaption> Figure 6. Vote setting page</figcaption>
+</figure>  
+<p>We have 2 sections under this page which are: share allocation and candidates adding.</p>
+<h2 id="smart-contract">Smart Contract</h2>
+<pre><code class="language-javascript"><div>pragma solidity &gt;=<span class="hljs-number">0.4</span><span class="hljs-number">.21</span> &lt;<span class="hljs-number">0.7</span><span class="hljs-number">.0</span>;
+
+contract Vote {
+    string public voteName;
+    uint256 public addCandidateStartDate;
+    uint256 public addCandidateEndDate;
+    uint256 public voteStartDate;
+    uint256 public voteEndDate;
+    address public voteDeployer;            
+    uint public totalCandidateNumber = <span class="hljs-number">0</span>;  
+    uint public maxNominatedNum;                  
+    uint public voteType = <span class="hljs-number">1</span>;
+    uint public totalShareNum;
+    uint public maxShareNum;
+    uint public currentTotalShareNum = <span class="hljs-number">0</span>;
+    bool comfirm = <span class="hljs-literal">false</span>;
+    mapping(<span class="hljs-function"><span class="hljs-params">uint</span> =&gt;</span> Candidate) public candidates;
+    mapping(<span class="hljs-function"><span class="hljs-params">address</span> =&gt;</span> Voter) public voters;
+    struct Candidate {
+        uint candidateId;
+        string candidateName;
+        string candidatePhoto;
+        string candidateInfo;
+        uint candidateTotalVote;
+    }
+
+    struct OneVote {
+        uint candidateId;
+        uint voteNum;
+    }
+
+    struct Voter{
+        uint voteChangeNum;         
+        uint stock;                
+        uint totalVoteNum;          
+        uint voteUsed;              
+        uint numOfPeopleNominated;  
+        mapping (<span class="hljs-function"><span class="hljs-params">uint</span> =&gt;</span> OneVote) myVote; 
+        bool hasVoted;
+    }
+    event allocateShareEvent(
+        address voter,
+        uint stock
+    );
+    event newVoteRecord(
+        uint candidateId,
+        uint voteNum
+    );
+    event changeVoteRecord(
+        uint candidateId,
+        uint voteNum
+    );
+    event lookForInfo(
+        uint candidateId,
+        uint inputId
+    );
+    event addCandidate(
+        uint candidateId,
+        string candidateName,
+        string candidatePhoto,
+        string candidateInfo,
+        uint candidateTotalVote
+    );
+    event vote(
+        uint voteName,
+        uint voteTime,
+        bool hasVoted
+    );
+    event lookUpMyVote(
+        address myAddr,
+        uint[] recordID,
+        uint[] candidateID,
+        uint[] voteNum
+        );
+    <span class="hljs-keyword">constructor</span>(uint256 _addStartDate, uint256 _addEndDate, 
+                uint256 _startDate, uint256 _endDate,
+                uint256 _maxNominatedNum, uint256 _totalShareNum, 
+                uint256 _maxShareNum, uint _voteType) public {
+        voteName = <span class="hljs-string">"block chain vote app"</span>;
+        addCandidateStartDate = _addStartDate;
+        addCandidateEndDate = _addEndDate;
+        voteStartDate = _startDate;
+        voteEndDate = _endDate;
+        voteType = _voteType;
+        maxNominatedNum = _maxNominatedNum;
+        voteDeployer = msg.sender;
+        totalShareNum = _totalShareNum;
+        maxShareNum = _maxShareNum;
+    }
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createNewCandidate</span>(<span class="hljs-params">string memory _cadidateName, string memory _candidatePhoto,
+                                string memory _cadidateInfo, uint256 _currentDate</span>) <span class="hljs-title">public</span> </span>{
+        <span class="hljs-built_in">require</span>(msg.sender == voteDeployer,
+        <span class="hljs-string">"You can't create new cadidate. Only deployer can do this."</span>);
+        <span class="hljs-built_in">require</span>(_currentDate &gt; addCandidateStartDate &amp;&amp; _currentDate &lt; addCandidateEndDate,
+                <span class="hljs-string">"The stage for adding new candiddate is not valid, no candidate can be added"</span>);
+        <span class="hljs-built_in">require</span>(bytes(_cadidateName).length &gt; <span class="hljs-number">0</span>, <span class="hljs-string">"candidate name is required"</span>);
+        <span class="hljs-built_in">require</span>(bytes(_cadidateInfo).length &gt; <span class="hljs-number">0</span>, <span class="hljs-string">"candidate info is required"</span>);
+        totalCandidateNumber++;
+        string memory photo = <span class="hljs-string">"https://en.wikipedia.org/wiki/Anonymous_(group)#/media/File:Anonymous_emblem.svg"</span>;
+        <span class="hljs-keyword">if</span>(bytes(_candidatePhoto).length &gt; <span class="hljs-number">0</span>){photo = _candidatePhoto;}
+        candidates[totalCandidateNumber] = Candidate(totalCandidateNumber,_cadidateName,photo,_cadidateInfo,<span class="hljs-number">0</span>);
+        emit addCandidate(totalCandidateNumber,_cadidateName,photo,_cadidateInfo,<span class="hljs-number">0</span>);
+    }
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">allocateShare</span>(<span class="hljs-params">address _voterAddr, uint _shareNum</span>) <span class="hljs-title">public</span> </span>{
+        <span class="hljs-built_in">require</span>(msg.sender == voteDeployer,
+        <span class="hljs-string">"You can't deploy stock. Only deployer can do this."</span>);
+        <span class="hljs-built_in">require</span>(_shareNum &lt;= maxShareNum,
+        <span class="hljs-string">"You can't deploy this stock number for this voter."</span>);
+        <span class="hljs-built_in">require</span>((currentTotalShareNum + _shareNum) &lt;= totalShareNum,
+        <span class="hljs-string">"You can't deploy more stock, current stock are greater than total stock."</span>);
+        currentTotalShareNum = currentTotalShareNum + _shareNum;
+        Voter memory _voter = voters[_voterAddr];
+        _voter.stock = _shareNum;
+        _voter.totalVoteNum = _shareNum * maxNominatedNum;
+        voters[_voterAddr] = _voter;
+        emit allocateShareEvent(_voterAddr, _shareNum);
+    }
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">voteForCandidate</span>(<span class="hljs-params">uint _candidateId, uint _voteNum, uint256 _currentDate</span>) <span class="hljs-title">public</span></span>{
+        <span class="hljs-built_in">require</span>(_currentDate &gt; voteStartDate &amp;&amp; _currentDate &lt; voteEndDate,
+        <span class="hljs-string">"The stage for voting is not valid, no vote can be created"</span>);
+        <span class="hljs-built_in">require</span>(_candidateId &gt; <span class="hljs-number">0</span> &amp;&amp; _candidateId &lt;= totalCandidateNumber, <span class="hljs-string">"Invalid Candidate Id"</span>);
+        <span class="hljs-built_in">require</span>(voters[msg.sender].hasVoted == <span class="hljs-literal">false</span> || voters[msg.sender].voteChangeNum &lt; <span class="hljs-number">3</span>,
+        <span class="hljs-string">'You have access your max voting modifying times(3 times)'</span>);
+        <span class="hljs-built_in">require</span>(voters[msg.sender].stock &gt; <span class="hljs-number">0</span>,
+        <span class="hljs-string">"You don't have any share. You can't vote"</span>);
+        <span class="hljs-built_in">require</span>(voters[msg.sender].numOfPeopleNominated &lt;= maxNominatedNum, 
+        <span class="hljs-string">"You can't vote for any more nominator. You can't vote"</span>);
+        Voter memory _voter = voters[msg.sender];
+        <span class="hljs-keyword">if</span>(voteType == <span class="hljs-number">1</span>){
+            <span class="hljs-built_in">require</span>(_voter.voteUsed + voters[msg.sender].stock &lt;= _voter.totalVoteNum, 
+            <span class="hljs-string">"You don't have so many votes"</span>);
+        }<span class="hljs-keyword">else</span>{
+            <span class="hljs-built_in">require</span>(_voter.voteUsed + _voteNum &lt;= _voter.totalVoteNum, 
+            <span class="hljs-string">"You don't have so many votes"</span>);
+        }
+        bool votedForCandidate = <span class="hljs-literal">false</span>;
+        <span class="hljs-keyword">for</span>(uint i = <span class="hljs-number">0</span>; i &lt;= voters[msg.sender].numOfPeopleNominated; i++){
+            <span class="hljs-comment">//emit lookForInfo(voters[msg.sender].myVote[i].candidateId, _candidateId);</span>
+            <span class="hljs-keyword">if</span>(voters[msg.sender].myVote[i].candidateId == _candidateId){
+                votedForCandidate = <span class="hljs-literal">true</span>;
+             }
+        }
+        <span class="hljs-built_in">require</span>(!votedForCandidate,
+            <span class="hljs-string">"You have voted for this candidate, use changeMyVote() to change your vote"</span>);
+         <span class="hljs-comment">// then lets input the new voting info</span>
+        voters[msg.sender].numOfPeopleNominated++;
+        voters[msg.sender].hasVoted = <span class="hljs-literal">true</span>;
+        uint currentVoteStock;
+        <span class="hljs-keyword">if</span>(voteType == <span class="hljs-number">1</span>) {
+            currentVoteStock = voters[msg.sender].stock;
+        } <span class="hljs-keyword">else</span> {
+            currentVoteStock = _voteNum;
+        }
+        OneVote memory myNewVote = OneVote(_candidateId, currentVoteStock);
+        voters[msg.sender].myVote[_voter.numOfPeopleNominated] = myNewVote;
+        voters[msg.sender].voteUsed += currentVoteStock;
+
+        Candidate memory _cadidate = candidates[_candidateId];
+        _cadidate.candidateTotalVote += currentVoteStock;
+        candidates[_candidateId] = _cadidate;
+
+        emit newVoteRecord(_candidateId, currentVoteStock);
+    }
+    <span class="hljs-comment">// this func can let you look up all the vote records</span>
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">lookUpVoteRecord</span>(<span class="hljs-params"></span>) <span class="hljs-title">public</span></span>{
+        uint num_p = voters[msg.sender].numOfPeopleNominated;
+        uint256[] memory recordID = <span class="hljs-keyword">new</span> uint256[](num_p);
+        uint256[] memory candidateID = <span class="hljs-keyword">new</span> uint256[](num_p);
+        uint256[] memory voteNum = <span class="hljs-keyword">new</span> uint256[](num_p);
+        <span class="hljs-keyword">for</span>(uint _recordId = <span class="hljs-number">0</span>;_recordId &lt; num_p;_recordId++){
+            recordID[_recordId] = _recordId;
+            candidateID[_recordId] = voters[msg.sender].myVote[_recordId].candidateId;
+            voteNum[_recordId] = voters[msg.sender].myVote[_recordId].voteNum;
+        }
+        emit lookUpMyVote(msg.sender,recordID,candidateID,voteNum);
+     }
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">changeMyVote</span>(<span class="hljs-params">uint _candidateId, uint _newVote, uint _voteInfoNum, uint256 _currentDate</span>) <span class="hljs-title">public</span> </span>{
+        <span class="hljs-built_in">require</span>(_currentDate &gt; voteStartDate &amp;&amp; _currentDate &lt; voteEndDate, 
+        <span class="hljs-string">"The stage for voting is not valid, no vote can be created"</span>);
+        <span class="hljs-built_in">require</span>(_candidateId &gt; <span class="hljs-number">0</span> &amp;&amp; _candidateId &lt;= totalCandidateNumber, 
+        <span class="hljs-string">'Invalid Candidate Id'</span>);
+        <span class="hljs-built_in">require</span>(voters[msg.sender].hasVoted == <span class="hljs-literal">true</span> &amp;&amp; voters[msg.sender].voteChangeNum &lt; <span class="hljs-number">3</span>,
+        <span class="hljs-string">'You have access your max voting modifying times(3 times)'</span>);
+        <span class="hljs-built_in">require</span>(voters[msg.sender].myVote[_voteInfoNum - <span class="hljs-number">1</span>].voteNum &gt; <span class="hljs-number">0</span>, 
+        <span class="hljs-string">"voting info ID is wrong, you haven't voted for this person"</span>);
+        Voter memory _voter = voters[msg.sender];
+        OneVote memory _voteToModify = voters[msg.sender].myVote[_voteInfoNum - <span class="hljs-number">1</span>];
+        <span class="hljs-comment">// emit lookForInfo(_voteToModify.candidateId, _voteToModify.voteNum);</span>
+        <span class="hljs-comment">// total voteUsed checking</span>
+        <span class="hljs-keyword">if</span>(voteType == <span class="hljs-number">2</span>) {
+            uint myLastVoteNum = _voteToModify.voteNum;
+            <span class="hljs-built_in">require</span>(_voter.voteUsed - myLastVoteNum + _newVote &lt;= _voter.totalVoteNum, 
+            <span class="hljs-string">"You don't have so many votes"</span>);
+        } <span class="hljs-keyword">else</span> {
+           bool votedForCandidate = <span class="hljs-literal">false</span>;
+           <span class="hljs-keyword">for</span>(uint i = <span class="hljs-number">0</span>; i &lt;= voters[msg.sender].numOfPeopleNominated; i++){
+            <span class="hljs-comment">//emit lookForInfo(voters[msg.sender].myVote[i].candidateId,_candidateId);</span>
+            <span class="hljs-keyword">if</span>(voters[msg.sender].myVote[i].candidateId == _candidateId 
+                &amp;&amp; voters[msg.sender].myVote[i].voteNum &gt; <span class="hljs-number">0</span>) {
+                votedForCandidate = <span class="hljs-literal">true</span>;
+             }
+             <span class="hljs-built_in">require</span>(!votedForCandidate, <span class="hljs-string">"You have voted for this candidate."</span>);
+            }
+        }
+        voters[msg.sender].voteChangeNum++;
+        Candidate memory _lastVoteCandidate = candidates[_voteToModify.candidateId];
+         <span class="hljs-keyword">if</span>(voteType == <span class="hljs-number">1</span>) {
+            _lastVoteCandidate.candidateTotalVote -= _voteToModify.voteNum;
+         } <span class="hljs-keyword">else</span> {
+            _lastVoteCandidate.candidateTotalVote -= _newVote;
+         }
+         candidates[_voteToModify.candidateId] = _lastVoteCandidate;
+         voters[msg.sender].voteUsed -= _voteToModify.voteNum;
+        uint currentVoteNum;
+        <span class="hljs-keyword">if</span>(voteType == <span class="hljs-number">1</span>) {
+            currentVoteNum = voters[msg.sender].stock;
+        } <span class="hljs-keyword">else</span> {
+            currentVoteNum = _newVote;
+        }
+        OneVote memory myNewVote = OneVote(_candidateId, currentVoteNum);
+        voters[msg.sender].voteUsed += currentVoteNum;
+        voters[msg.sender].myVote[_voteInfoNum - <span class="hljs-number">1</span>] = myNewVote;
+        Candidate memory _cadidate = candidates[_candidateId];
+        _cadidate.candidateTotalVote += currentVoteNum;
+        candidates[_candidateId] = _cadidate;
+        emit changeVoteRecord(_candidateId, currentVoteNum);
+    }
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">changeVoteType</span>(<span class="hljs-params">uint _type</span>) <span class="hljs-title">public</span> </span>{
+        voteType = _type;
+    }
+}
+</div></code></pre>
+<h2 id="testing">Testing</h2>
+<pre><code class="language-javascript"><div><span class="hljs-keyword">const</span> Vote = artifacts.require(<span class="hljs-string">"./Vote.sol"</span>);
+
+contract(<span class="hljs-string">"Vote Test"</span>, <span class="hljs-keyword">async</span> accounts =&gt; {
+    <span class="hljs-keyword">var</span> vote;
+    before(<span class="hljs-keyword">async</span>()=&gt;{
+        vote = <span class="hljs-keyword">await</span> Vote.deployed();
+    });
+
+    describe(<span class="hljs-string">'initializes the vote contract'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+        it(<span class="hljs-string">'get vote name'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+            <span class="hljs-keyword">let</span> voteName = <span class="hljs-keyword">await</span> vote.voteName();
+            assert.equal(voteName, <span class="hljs-string">'block chain vote app'</span>);
+        });
+
+        it(<span class="hljs-string">'get add candidate start and end date'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+            <span class="hljs-keyword">let</span> startDate = <span class="hljs-keyword">await</span> vote.addCandidateStartDate();
+            <span class="hljs-keyword">let</span> endDate = <span class="hljs-keyword">await</span> vote.addCandidateEndDate();
+            assert.equal(startDate.toNumber(), <span class="hljs-number">100</span>);
+            assert.equal(endDate.toNumber(), <span class="hljs-number">200</span>);
+        });
+
+        it(<span class="hljs-string">'get add vote start and end date'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+            <span class="hljs-keyword">let</span> startDate = <span class="hljs-keyword">await</span> vote.voteStartDate();
+            <span class="hljs-keyword">let</span> endDate = <span class="hljs-keyword">await</span> vote.voteEndDate();
+            assert.equal(startDate.toNumber(), <span class="hljs-number">300</span>);
+            assert.equal(endDate.toNumber(), <span class="hljs-number">400</span>);
+        });
+
+        it(<span class="hljs-string">'get vote type, max nominated number and vote deployer'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+            <span class="hljs-keyword">let</span> voteType = <span class="hljs-keyword">await</span> vote.voteType();
+            <span class="hljs-keyword">let</span> maxNominatedNum = <span class="hljs-keyword">await</span> vote.maxNominatedNum();
+            <span class="hljs-keyword">let</span> address = <span class="hljs-keyword">await</span> vote.voteDeployer();
+            assert.equal(address, accounts[<span class="hljs-number">0</span>]);
+            assert.equal(maxNominatedNum.toNumber(), <span class="hljs-number">5</span>);
+        });
+
+        it(<span class="hljs-string">'get total share and max share per person'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+            <span class="hljs-keyword">let</span> totalShareNum = <span class="hljs-keyword">await</span> vote.totalShareNum();
+            <span class="hljs-keyword">let</span> maxShareNum = <span class="hljs-keyword">await</span> vote.maxShareNum();
+            assert.equal(totalShareNum.toNumber(), <span class="hljs-number">100</span>);
+            assert.equal(maxShareNum.toNumber(), <span class="hljs-number">50</span>);
+        });
+    });
+
+
+    describe(<span class="hljs-string">'create candidates in contract'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+        it(<span class="hljs-string">'create a candidate with complete information'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+            <span class="hljs-keyword">let</span> result1 = <span class="hljs-keyword">await</span> vote.createNewCandidate(<span class="hljs-string">'Kobe Bryant'</span>, <span class="hljs-string">'https://KB.jpg'</span>, <span class="hljs-string">'Basketball player'</span>, <span class="hljs-number">150</span>,{<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">0</span>]});
+            <span class="hljs-keyword">let</span> totalCandidateNumber = <span class="hljs-keyword">await</span> vote.totalCandidateNumber();
+            <span class="hljs-keyword">let</span> event1 = result1.logs[<span class="hljs-number">0</span>].args;
+            assert.equal(event1.candidateId.toNumber(), totalCandidateNumber.toNumber(), <span class="hljs-string">'Candidate id is correct'</span>);
+            assert.equal(event1.candidateName, <span class="hljs-string">'Kobe Bryant'</span>,<span class="hljs-string">'Candidate name is correct'</span>);
+            assert.equal(event1.candidatePhoto, <span class="hljs-string">'https://KB.jpg'</span>,<span class="hljs-string">'Candidate photo url is correct'</span>);
+            assert.equal(event1.candidateInfo, <span class="hljs-string">'Basketball player'</span>,<span class="hljs-string">'Candidate info is correct'</span>);
+            assert.equal(event1.candidateTotalVote.toNumber(), <span class="hljs-number">0</span>,<span class="hljs-string">'Candidate vote number is correct'</span>);
+        });
+
+        it(<span class="hljs-string">'create a candidate with incomplete information'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+            <span class="hljs-comment">//invalid candidate name</span>
+            <span class="hljs-keyword">try</span>{
+                <span class="hljs-keyword">await</span> vote.createNewCandidate(<span class="hljs-string">''</span>, <span class="hljs-string">'https://KB.jpg'</span>, <span class="hljs-string">'Basketball player'</span>, <span class="hljs-number">150</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">0</span>]});
+             }<span class="hljs-keyword">catch</span>(error){
+                 assert.equal(error.message.includes(<span class="hljs-string">'candidate name is required'</span>), <span class="hljs-literal">true</span>);
+             }  
+
+             <span class="hljs-comment">//invalid candiate info</span>
+             <span class="hljs-keyword">try</span>{
+                <span class="hljs-keyword">await</span> vote.createNewCandidate(<span class="hljs-string">'Kobe Bryant'</span>, <span class="hljs-string">'https://KB.jpg'</span>, <span class="hljs-string">''</span>, <span class="hljs-number">150</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">0</span>]});
+             }<span class="hljs-keyword">catch</span>(error){
+                 assert.equal(error.message.includes(<span class="hljs-string">'candidate info is required'</span>), <span class="hljs-literal">true</span>);
+             } 
+
+             <span class="hljs-comment">//invalid add deployer address</span>
+             <span class="hljs-keyword">try</span>{
+                <span class="hljs-keyword">await</span> vote.createNewCandidate(<span class="hljs-string">'Kobe Bryant'</span>, <span class="hljs-string">'https://KB.jpg'</span>, <span class="hljs-string">''</span>, <span class="hljs-number">150</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">1</span>]});
+             }<span class="hljs-keyword">catch</span>(error){
+                 assert.equal(error.message.includes(<span class="hljs-string">"You can't create new cadidate. Only deployer can do this."</span>), <span class="hljs-literal">true</span>);
+             } 
+
+             <span class="hljs-comment">//invalid create time</span>
+             <span class="hljs-keyword">try</span>{
+                <span class="hljs-keyword">await</span> vote.createNewCandidate(<span class="hljs-string">'Kobe Bryant'</span>, <span class="hljs-string">'https://KB.jpg'</span>, <span class="hljs-string">'Basketball player'</span>, <span class="hljs-number">300</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">0</span>]});
+             }<span class="hljs-keyword">catch</span>(error){
+                 assert.equal(error.message.includes(<span class="hljs-string">"The stage for adding new candiddate is not valid, no candidate can be added"</span>), <span class="hljs-literal">true</span>);
+             } 
+        });
+    });
+
+    describe(<span class="hljs-string">'allocate share in contract'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+        it(<span class="hljs-string">'allocate share to specific address'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+            <span class="hljs-keyword">let</span> result2 = <span class="hljs-keyword">await</span> vote.allocateShare(accounts[<span class="hljs-number">1</span>], <span class="hljs-number">10</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">0</span>]});
+            <span class="hljs-keyword">let</span> event2 = result2.logs[<span class="hljs-number">0</span>].args;
+            <span class="hljs-keyword">let</span> address = event2.voter;
+            assert.equal(address, accounts[<span class="hljs-number">1</span>]);
+            assert.equal(event2.stock.toNumber(), <span class="hljs-number">10</span>);
+
+            <span class="hljs-keyword">let</span> voter = <span class="hljs-keyword">await</span> vote.voters(address);
+            <span class="hljs-keyword">let</span> maxNominatedNum = <span class="hljs-keyword">await</span> vote.maxNominatedNum();
+            assert.equal(voter.stock.toNumber(), <span class="hljs-number">10</span>);
+            assert.equal(voter.totalVoteNum.toNumber(), <span class="hljs-number">10</span> * maxNominatedNum.toNumber());
+        });
+
+        it(<span class="hljs-string">'allocate share with invalid inputs'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+            <span class="hljs-comment">//invalid deployer address</span>
+            <span class="hljs-keyword">try</span>{
+                <span class="hljs-keyword">await</span> vote.allocateShare(accounts[<span class="hljs-number">1</span>], <span class="hljs-number">10</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">1</span>]});
+            }<span class="hljs-keyword">catch</span>(error){
+                assert.equal(error.message.includes(<span class="hljs-string">"You can't deploy stock. Only deployer can do this."</span>), <span class="hljs-literal">true</span>);
+            }
+
+            <span class="hljs-comment">//invalid deployer address</span>
+            <span class="hljs-keyword">try</span>{
+                <span class="hljs-keyword">await</span> vote.allocateShare(accounts[<span class="hljs-number">1</span>], <span class="hljs-number">50</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">0</span>]});
+                <span class="hljs-keyword">await</span> vote.allocateShare(accounts[<span class="hljs-number">1</span>], <span class="hljs-number">45</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">0</span>]});
+            }<span class="hljs-keyword">catch</span>(error){
+                assert.equal(error.message.includes(<span class="hljs-string">"You can't deploy more stock, current stock are greater than total stock."</span>), <span class="hljs-literal">true</span>);
+            } 
+        });
+    });
+
+    describe(<span class="hljs-string">'vote for candidates'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+        it(<span class="hljs-string">'valid vote for candidates under straight type'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+            <span class="hljs-keyword">let</span> result3 = <span class="hljs-keyword">await</span> vote.voteForCandidate(<span class="hljs-number">1</span>, <span class="hljs-number">10</span>, <span class="hljs-number">350</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">1</span>]});
+            <span class="hljs-keyword">let</span> event3 = result3.logs[<span class="hljs-number">0</span>].args;  <span class="hljs-comment">//[0]: look up event</span>
+            <span class="hljs-keyword">let</span> voter = <span class="hljs-keyword">await</span> vote.voters(accounts[<span class="hljs-number">1</span>]);
+            <span class="hljs-keyword">let</span> candidate = <span class="hljs-keyword">await</span> vote.candidates(<span class="hljs-number">1</span>);
+
+            assert.equal(voter.numOfPeopleNominated.toNumber(), <span class="hljs-number">1</span>);
+            assert.equal(voter.hasVoted, <span class="hljs-literal">true</span>);
+            assert.equal(voter.voteUsed.toNumber(), <span class="hljs-number">50</span>);
+            assert.equal(candidate.candidateTotalVote.toNumber(), <span class="hljs-number">50</span>);
+
+            assert.equal(event3.candidateId.toNumber(), <span class="hljs-number">1</span>);
+            assert.equal(event3.voteNum.toNumber(), <span class="hljs-number">50</span>);
+        });
+
+        it(<span class="hljs-string">'valid vote for candidates with cumulative vote'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+            <span class="hljs-keyword">await</span> vote.changeVoteType(<span class="hljs-number">2</span>);
+            <span class="hljs-keyword">let</span> type = <span class="hljs-keyword">await</span> vote.voteType();
+            assert.equal(type.toNumber(), <span class="hljs-number">2</span>);
+            <span class="hljs-keyword">let</span> curTotalShare = <span class="hljs-keyword">await</span> vote.currentTotalShareNum();
+            assert.equal(curTotalShare.toNumber(), <span class="hljs-number">60</span>);
+
+            <span class="hljs-keyword">await</span> vote.allocateShare(accounts[<span class="hljs-number">2</span>], <span class="hljs-number">30</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">0</span>]});
+            <span class="hljs-keyword">let</span> result4 = <span class="hljs-keyword">await</span> vote.voteForCandidate(<span class="hljs-number">1</span>, <span class="hljs-number">100</span>, <span class="hljs-number">350</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">2</span>]});
+            <span class="hljs-keyword">let</span> event4 = result4.logs[<span class="hljs-number">0</span>].args;  <span class="hljs-comment">//[0]: look up event</span>
+            <span class="hljs-keyword">let</span> voter = <span class="hljs-keyword">await</span> vote.voters(accounts[<span class="hljs-number">1</span>]);
+            <span class="hljs-keyword">let</span> candidate = <span class="hljs-keyword">await</span> vote.candidates(<span class="hljs-number">1</span>);
+
+            assert.equal(candidate.candidateTotalVote.toNumber(), <span class="hljs-number">150</span>);
+            assert.equal(event4.candidateId.toNumber(), <span class="hljs-number">1</span>);
+            assert.equal(event4.voteNum.toNumber(), <span class="hljs-number">100</span>);
+
+            <span class="hljs-keyword">await</span> vote.changeVoteType(<span class="hljs-number">1</span>);
+            type = <span class="hljs-keyword">await</span> vote.voteType();
+            assert.equal(type.toNumber(), <span class="hljs-number">1</span>);
+        });
+
+        it(<span class="hljs-string">'invalid vote with wrong input'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+            <span class="hljs-comment">//invalid vote date</span>
+            <span class="hljs-keyword">try</span>{
+                <span class="hljs-keyword">await</span> vote.voteForCandidate(<span class="hljs-number">1</span>, <span class="hljs-number">100</span>, <span class="hljs-number">450</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">2</span>]});
+            }<span class="hljs-keyword">catch</span>(error){
+                assert.equal(error.message.includes(<span class="hljs-string">"The stage for voting is not valid, no vote can be created"</span>), <span class="hljs-literal">true</span>);
+            }
+            <span class="hljs-comment">//invalid vote candidate id</span>
+            <span class="hljs-keyword">try</span>{
+                <span class="hljs-keyword">await</span> vote.voteForCandidate(<span class="hljs-number">2</span>, <span class="hljs-number">100</span>, <span class="hljs-number">350</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">2</span>]});
+            }<span class="hljs-keyword">catch</span>(error){
+                assert.equal(error.message.includes(<span class="hljs-string">"Invalid Candidate Id"</span>), <span class="hljs-literal">true</span>);
+            }
+            <span class="hljs-comment">//account with no share</span>
+            <span class="hljs-keyword">try</span>{
+                <span class="hljs-keyword">await</span> vote.voteForCandidate(<span class="hljs-number">1</span>, <span class="hljs-number">100</span>, <span class="hljs-number">350</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">3</span>]});
+            }<span class="hljs-keyword">catch</span>(error) {
+                assert.equal(error.message.includes(<span class="hljs-string">"You don't have any share. You can't vote"</span>), <span class="hljs-literal">true</span>);
+            }
+            <span class="hljs-comment">//exceed total vote number</span>
+            <span class="hljs-keyword">try</span>{
+                <span class="hljs-keyword">await</span> vote.changeVoteType(<span class="hljs-number">2</span>);
+                <span class="hljs-keyword">await</span> vote.voteForCandidate(<span class="hljs-number">1</span>, <span class="hljs-number">100</span>, <span class="hljs-number">350</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">2</span>]});
+            }<span class="hljs-keyword">catch</span>(error) {
+                <span class="hljs-keyword">await</span> vote.changeVoteType(<span class="hljs-number">1</span>);
+                assert.equal(error.message.includes(<span class="hljs-string">"You don't have so many votes"</span>), <span class="hljs-literal">true</span>);
+            }
+        });
+    });
+
+    describe(<span class="hljs-string">'change candidate vote'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+        it(<span class="hljs-string">'change exsiting voting under straight type'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+            <span class="hljs-keyword">let</span> type = <span class="hljs-keyword">await</span> vote.voteType();
+            assert.equal(type.toNumber(), <span class="hljs-number">1</span>);
+
+            <span class="hljs-keyword">await</span> vote.createNewCandidate(<span class="hljs-string">'Michael Jordan'</span>, <span class="hljs-string">'https://MJ.jpg'</span>, <span class="hljs-string">'NBA Basketball player'</span>, <span class="hljs-number">150</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">0</span>]});
+            <span class="hljs-keyword">let</span> result4 = <span class="hljs-keyword">await</span> vote.changeMyVote(<span class="hljs-number">2</span>, <span class="hljs-number">10</span>, <span class="hljs-number">1</span>, <span class="hljs-number">350</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">1</span>]});
+            <span class="hljs-keyword">let</span> event4 = result4.logs[<span class="hljs-number">0</span>].args; 
+            <span class="hljs-keyword">let</span> voter = <span class="hljs-keyword">await</span> vote.voters(accounts[<span class="hljs-number">1</span>]);
+            <span class="hljs-keyword">let</span> candidate1 = <span class="hljs-keyword">await</span> vote.candidates(<span class="hljs-number">1</span>);
+            <span class="hljs-keyword">let</span> candidate2 = <span class="hljs-keyword">await</span> vote.candidates(<span class="hljs-number">2</span>);
+
+            assert.equal(event4.candidateId.toNumber(), <span class="hljs-number">2</span>);
+            assert.equal(event4.voteNum.toNumber(), <span class="hljs-number">50</span>);
+            assert.equal(candidate1.candidateTotalVote.toNumber(), <span class="hljs-number">100</span>);
+            assert.equal(candidate2.candidateTotalVote.toNumber(), <span class="hljs-number">50</span>);
+            assert.equal(voter.voteChangeNum.toNumber(), <span class="hljs-number">1</span>);
+        });
+
+        it(<span class="hljs-string">'change exsiting voting under cumulative type'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+            <span class="hljs-keyword">await</span> vote.changeVoteType(<span class="hljs-number">2</span>);
+            <span class="hljs-keyword">let</span> type = <span class="hljs-keyword">await</span> vote.voteType();
+            assert.equal(type.toNumber(), <span class="hljs-number">2</span>);
+
+            <span class="hljs-keyword">let</span> result5 = <span class="hljs-keyword">await</span> vote.changeMyVote(<span class="hljs-number">2</span>, <span class="hljs-number">50</span>, <span class="hljs-number">1</span>, <span class="hljs-number">350</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">2</span>]});
+            <span class="hljs-keyword">let</span> event5 = result5.logs[<span class="hljs-number">0</span>].args; 
+            <span class="hljs-keyword">let</span> voter = <span class="hljs-keyword">await</span> vote.voters(accounts[<span class="hljs-number">2</span>]);
+            <span class="hljs-keyword">let</span> candidate1 = <span class="hljs-keyword">await</span> vote.candidates(<span class="hljs-number">1</span>);
+            <span class="hljs-keyword">let</span> candidate2 = <span class="hljs-keyword">await</span> vote.candidates(<span class="hljs-number">2</span>);
+
+            assert.equal(event5.candidateId.toNumber(), <span class="hljs-number">2</span>);
+            assert.equal(event5.voteNum.toNumber(), <span class="hljs-number">50</span>);
+            assert.equal(candidate1.candidateTotalVote.toNumber(), <span class="hljs-number">50</span>);
+            assert.equal(candidate2.candidateTotalVote.toNumber(), <span class="hljs-number">100</span>);
+            assert.equal(voter.voteChangeNum.toNumber(), <span class="hljs-number">1</span>);
+
+            <span class="hljs-keyword">await</span> vote.changeVoteType(<span class="hljs-number">1</span>);
+            type = <span class="hljs-keyword">await</span> vote.voteType();
+            assert.equal(type.toNumber(), <span class="hljs-number">1</span>);
+        });
+
+        it(<span class="hljs-string">'invalid change exsiting voting'</span>, <span class="hljs-keyword">async</span> () =&gt; {
+            <span class="hljs-comment">//invalid vote date</span>
+            <span class="hljs-keyword">try</span>{
+                <span class="hljs-keyword">await</span> vote.changeMyVote(<span class="hljs-number">2</span>, <span class="hljs-number">10</span>, <span class="hljs-number">1</span>, <span class="hljs-number">450</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">1</span>]});
+            }<span class="hljs-keyword">catch</span>(error){
+                assert.equal(error.message.includes(<span class="hljs-string">"The stage for voting is not valid, no vote can be created"</span>), <span class="hljs-literal">true</span>);
+            }
+            <span class="hljs-comment">//invalid candidate Id</span>
+            <span class="hljs-keyword">try</span>{
+                <span class="hljs-keyword">await</span> vote.changeMyVote(<span class="hljs-number">3</span>, <span class="hljs-number">10</span>, <span class="hljs-number">1</span>, <span class="hljs-number">350</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">1</span>]});
+            }<span class="hljs-keyword">catch</span>(error){
+                assert.equal(error.message.includes(<span class="hljs-string">"Invalid Candidate Id"</span>), <span class="hljs-literal">true</span>);
+            }
+            <span class="hljs-comment">//have not voted for this candidate yet</span>
+            <span class="hljs-keyword">try</span>{
+                <span class="hljs-keyword">await</span> vote.createNewCandidate(<span class="hljs-string">'Ming Yao'</span>, <span class="hljs-string">'https://MY.jpg'</span>, <span class="hljs-string">'NBA &amp; CBA Basketball player'</span>, <span class="hljs-number">150</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">0</span>]});
+                <span class="hljs-keyword">await</span> vote.changeMyVote(<span class="hljs-number">3</span>, <span class="hljs-number">10</span>, <span class="hljs-number">1</span>, <span class="hljs-number">350</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">1</span>]});
+            }<span class="hljs-keyword">catch</span>(error){
+                assert.equal(error.message.includes(<span class="hljs-string">"voting info ID is wrong, you haven't voted for this person"</span>), <span class="hljs-literal">true</span>);
+            }
+            <span class="hljs-comment">//have not voted for this candidate yet</span>
+            <span class="hljs-keyword">try</span>{
+                <span class="hljs-keyword">await</span> vote.changeVoteType(<span class="hljs-number">2</span>);
+                <span class="hljs-keyword">await</span> vote.changeMyVote(<span class="hljs-number">2</span>, <span class="hljs-number">200</span>, <span class="hljs-number">1</span>, <span class="hljs-number">350</span>, {<span class="hljs-attr">from</span>: accounts[<span class="hljs-number">2</span>]});
+            }<span class="hljs-keyword">catch</span>(error){
+                <span class="hljs-keyword">await</span> vote.changeVoteType(<span class="hljs-number">1</span>);
+                assert.equal(error.message.includes(<span class="hljs-string">"You don't have so many votes"</span>), <span class="hljs-literal">true</span>);
+            }
+        });
+    });
+});
+</div></code></pre>
+<h2 id="testing-result">Testing Result</h2>
+<figure class="image">
+<img src="file:////Users/xiaojuntian/UBC/EECE571G_BLOCKCHAIN/reports/images/testResults.png" width="500"/>
+<figcaption> Figure 7. Test Results</figcaption>
+</figure>  
+
+    </body>
+    </html>
