@@ -151,10 +151,10 @@ contract Vote {
     function voteForCandidate(uint _candidateId, uint _voteNum, uint256 _currentDate) public{
         require(_currentDate > voteStartDate && _currentDate < voteEndDate,
         "The stage for voting is not valid, no vote can be created");
-        require(_candidateId > 0 && _candidateId <= totalCandidateNumber, 'Candidate invalid');
+        require(_candidateId > 0 && _candidateId <= totalCandidateNumber, "Invalid Candidate Id");
         require(voters[msg.sender].hasVoted == false || voters[msg.sender].voteChangeNum < 3,
         'You have access your max voting modifying times(3 times)');
-        require(voters[msg.sender].stock > 0, "You don't have any stock. You can't vote");
+        require(voters[msg.sender].stock > 0, "You don't have any share. You can't vote");
         require(voters[msg.sender].numOfPeopleNominated <= maxNominatedNum, "You can't vote for any more nominator. You can't vote");
         // get the last voting info
         Voter memory _voter = voters[msg.sender];
@@ -164,7 +164,6 @@ contract Vote {
         }else{
             require(_voter.voteUsed + _voteNum <= _voter.totalVoteNum, "You don't have so many votes");
         }
-
         // check wether you have voted for this candidates or not
         bool votedForCandidate = false;
         for(uint i = 0; i <= voters[msg.sender].numOfPeopleNominated; i++){
@@ -217,9 +216,9 @@ contract Vote {
     // then it will deduct the votes from the previous candidate you vote
     // after that it will add the vote to the new candidate you want to vote
     // this func won't change the numOfPeopleNominated
-    function changeMyVote(uint _candidateId, uint _newVote, uint _voteInfoNum, uint256 _currentDate) public{
+    function changeMyVote(uint _candidateId, uint _newVote, uint _voteInfoNum, uint256 _currentDate) public {
         require(_currentDate > voteStartDate && _currentDate < voteEndDate, "The stage for voting is not valid, no vote can be created");
-        require(_candidateId > 0 && _candidateId <= totalCandidateNumber, 'Candidate invalid');
+        require(_candidateId > 0 && _candidateId <= totalCandidateNumber, 'Invalid Candidate Id');
         require(voters[msg.sender].hasVoted == true && voters[msg.sender].voteChangeNum < 3,
         'You have access your max voting modifying times(3 times)');
         require(voters[msg.sender].myVote[_voteInfoNum - 1].voteNum > 0, "voting info ID is wrong, you haven't voted for this person");
@@ -245,10 +244,14 @@ contract Vote {
         // now start to modify
         voters[msg.sender].voteChangeNum++;
         // last candidate I vote
-        Candidate memory _lastVoteCadidate = candidates[_voteToModify.candidateId];
+        Candidate memory _lastVoteCandidate = candidates[_voteToModify.candidateId];
          // retrieve the voteNumUsed and the candidate voteNum
-         _lastVoteCadidate.candidateTotalVote -= _voteToModify.voteNum;
-         candidates[_voteToModify.candidateId] = _lastVoteCadidate;
+         if(voteType == 1) {
+            _lastVoteCandidate.candidateTotalVote -= _voteToModify.voteNum;
+         } else {
+            _lastVoteCandidate.candidateTotalVote -= _newVote;
+         }
+         candidates[_voteToModify.candidateId] = _lastVoteCandidate;
          voters[msg.sender].voteUsed -= _voteToModify.voteNum;
          // now input the new vote info
         uint currentVoteNum;
@@ -264,5 +267,9 @@ contract Vote {
         _cadidate.candidateTotalVote += currentVoteNum;
         candidates[_candidateId] = _cadidate;
         emit changeVoteRecord(_candidateId, currentVoteNum);
+    }
+
+    function changeVoteType(uint _type) public {
+        voteType = _type;
     }
 }

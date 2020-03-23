@@ -119,7 +119,7 @@ contract("Vote Test", async accounts => {
     });
 
     describe('vote for candidates', async () => {
-        it('valid vote for candidates under straght voting', async () => {
+        it('valid vote for candidates under straight type', async () => {
             let result3 = await vote.voteForCandidate(1, 10, 350, {from: accounts[1]});
             let event3 = result3.logs[0].args;  //[0]: look up event
             let voter = await vote.voters(accounts[1]);
@@ -133,10 +133,64 @@ contract("Vote Test", async accounts => {
             assert.equal(event3.candidateId.toNumber(), 1);
             assert.equal(event3.voteNum.toNumber(), 50);
         });
+
+        it('valid vote for candidates with cumulative vote', async () => {
+            await vote.changeVoteType(2);
+            let type = await vote.voteType();
+            assert.equal(type.toNumber(), 2);
+            let curTotalShare = await vote.currentTotalShareNum();
+            assert.equal(curTotalShare.toNumber(), 60);
+
+            await vote.allocateShare(accounts[2], 30, {from: accounts[0]});
+            let result4 = await vote.voteForCandidate(1, 100, 350, {from: accounts[2]});
+            let event4 = result4.logs[0].args;  //[0]: look up event
+            let voter = await vote.voters(accounts[1]);
+            let candidate = await vote.candidates(1);
+
+            assert.equal(candidate.candidateTotalVote.toNumber(), 150);
+            assert.equal(event4.candidateId.toNumber(), 1);
+            assert.equal(event4.voteNum.toNumber(), 100);
+
+            await vote.changeVoteType(1);
+            type = await vote.voteType();
+            assert.equal(type.toNumber(), 1);
+        });
+
+        it('invalid vote with wrong input', async () => {
+            //invalid vote date
+            try{
+                await vote.voteForCandidate(1, 100, 450, {from: accounts[2]});
+            }catch(error){
+                assert.equal(error.message.includes("The stage for voting is not valid, no vote can be created"), true);
+            }
+            //invalid vote candidate id
+            try{
+                await vote.voteForCandidate(2, 100, 350, {from: accounts[2]});
+            }catch(error){
+                assert.equal(error.message.includes("Invalid Candidate Id"), true);
+            }
+            //account with no share
+            try{
+                await vote.voteForCandidate(1, 100, 350, {from: accounts[3]});
+            }catch(error) {
+                assert.equal(error.message.includes("You don't have any share. You can't vote"), true);
+            }
+            //exceed total vote number
+            try{
+                await vote.changeVoteType(2);
+                await vote.voteForCandidate(1, 100, 350, {from: accounts[2]});
+            }catch(error) {
+                await vote.changeVoteType(1);
+                assert.equal(error.message.includes("You don't have so many votes"), true);
+            }
+        });
     });
 
     describe('change candidate vote', async () => {
-        it('change exsiting voting', async () => {
+        it('change exsiting voting under straight type', async () => {
+            let type = await vote.voteType();
+            assert.equal(type.toNumber(), 1);
+
             await vote.createNewCandidate('Michael Jordan', 'https://MJ.jpg', 'NBA Basketball player', 150, {from: accounts[0]});
             let result4 = await vote.changeMyVote(2, 10, 1, 350, {from: accounts[1]});
             let event4 = result4.logs[0].args; 
@@ -146,9 +200,61 @@ contract("Vote Test", async accounts => {
 
             assert.equal(event4.candidateId.toNumber(), 2);
             assert.equal(event4.voteNum.toNumber(), 50);
-            assert.equal(candidate1.candidateTotalVote.toNumber(), 0);
+            assert.equal(candidate1.candidateTotalVote.toNumber(), 100);
             assert.equal(candidate2.candidateTotalVote.toNumber(), 50);
             assert.equal(voter.voteChangeNum.toNumber(), 1);
+        });
+
+        it('change exsiting voting under cumulative type', async () => {
+            await vote.changeVoteType(2);
+            let type = await vote.voteType();
+            assert.equal(type.toNumber(), 2);
+
+            let result5 = await vote.changeMyVote(2, 50, 1, 350, {from: accounts[2]});
+            let event5 = result5.logs[0].args; 
+            let voter = await vote.voters(accounts[2]);
+            let candidate1 = await vote.candidates(1);
+            let candidate2 = await vote.candidates(2);
+
+            assert.equal(event5.candidateId.toNumber(), 2);
+            assert.equal(event5.voteNum.toNumber(), 50);
+            assert.equal(candidate1.candidateTotalVote.toNumber(), 50);
+            assert.equal(candidate2.candidateTotalVote.toNumber(), 100);
+            assert.equal(voter.voteChangeNum.toNumber(), 1);
+
+            await vote.changeVoteType(1);
+            type = await vote.voteType();
+            assert.equal(type.toNumber(), 1);
+        });
+
+        it('invalid change exsiting voting', async () => {
+            //invalid vote date
+            try{
+                await vote.changeMyVote(2, 10, 1, 450, {from: accounts[1]});
+            }catch(error){
+                assert.equal(error.message.includes("The stage for voting is not valid, no vote can be created"), true);
+            }
+            //invalid candidate Id
+            try{
+                await vote.changeMyVote(3, 10, 1, 350, {from: accounts[1]});
+            }catch(error){
+                assert.equal(error.message.includes("Invalid Candidate Id"), true);
+            }
+            //have not voted for this candidate yet
+            try{
+                await vote.createNewCandidate('Ming Yao', 'https://MY.jpg', 'NBA & CBA Basketball player', 150, {from: accounts[0]});
+                await vote.changeMyVote(3, 10, 1, 350, {from: accounts[1]});
+            }catch(error){
+                assert.equal(error.message.includes("voting info ID is wrong, you haven't voted for this person"), true);
+            }
+            //have not voted for this candidate yet
+            try{
+                await vote.changeVoteType(2);
+                await vote.changeMyVote(2, 200, 1, 350, {from: accounts[2]});
+            }catch(error){
+                await vote.changeVoteType(1);
+                assert.equal(error.message.includes("You don't have so many votes"), true);
+            }
         });
     });
 
