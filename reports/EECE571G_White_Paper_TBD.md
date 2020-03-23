@@ -17,7 +17,7 @@ From the US presidential election to student association resolution, voting is a
 -   Impossible to alter vote before the deadline if the voters change their mind
 -   Hackers can apply malicious attack the back-end server/database and manipulate the results
 
-### Advantages of online voting through Blockchain
+### Advantages of online voting through blockchain
 
 -   The voting results are public and immutable
 -   The decentralized network can help prevent malicious attack
@@ -94,12 +94,10 @@ The main interface page contains greeting information, also your current account
 Candidate related information like: name, personal photo and introduction and current votes number. Voter can vote for candididate by inputing the number of votes and clicking vote button.
 
 ### Result Page
-<div style="align: center">
-    <figure class="image">
-    <img src="./images/ResultAfterVote.png" />
-    <figcaption> Figure 4. Results Page</figcaption>
-    </figure>  
-</div>
+<figure class="image">
+<img src="./images/ResultAfterVote.png" />
+<figcaption> Figure 4. Results Page</figcaption>
+</figure>  
 
 Voter can see the current votes results any time they want to see. The results shown in a histogram.
 
