@@ -19,18 +19,18 @@ contract Vote {
     uint public totalCandidateNumber = 0;
     
     // how many people can be nominated
-    uint maxNominatedNum;
+    uint public maxNominatedNum;
     
     // vote type should be straight voting or cumulative voting
     // 1-> straight voting
     // 2-> cumulative voting
-    uint voteType=1;
+    uint public voteType=1;
     
     // should decide the total stock
     // should decide the threshold of the max stock of a Voter
     // the stock cannot be changed after the deployer confirms
-    uint totalShareNum;
-    uint maxShareNum;
+    uint public totalShareNum;
+    uint public maxShareNum;
     uint public currentTotalShareNum = 0;
     
     // deployer should confirm when finish deploying the stock
@@ -93,7 +93,7 @@ contract Vote {
     );
     
     event lookUpMyVote(
-        address myAddr,
+        address indexed myAddr,
         uint[] recordID,
         uint[] candidateID,
         uint[] voteNum

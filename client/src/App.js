@@ -39,6 +39,10 @@ class App extends Component {
     this.getMyInfo = this.getMyInfo.bind(this);
     this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
 
+    this.viewOneCandidateInfo = this.viewOneCandidateInfo.bind(this);
+    this.viewTotalShares = this.viewTotalShares.bind(this);
+    this.viewAllocatedShares = this.viewAllocatedShares.bind(this);
+    this.viewMaxAllocatShares = this.viewMaxAllocatShares.bind(this);
 
   }
 
@@ -124,7 +128,7 @@ class App extends Component {
     })
   }
 
- //call viewAllCandidate(). Can return an array containing item obj
+ //call viewAllCandidate(). Can return an array containing item obj. return all caniddate info
   async viewAllCandidate(){
     const totalNumber = await this.state.deployedVoteContract.methods.totalCandidateNumber().call(); 
     let candidates=[];
@@ -134,6 +138,12 @@ class App extends Component {
         candidates[i] = candidate; // append the item into the existing item array
     }
     return candidates;
+  }
+
+   //Can return an item obj containing one candidate info
+   async viewOneCandidateInfo(i){
+    const candidate = await this.state.deployedVoteContract.methods.candidates(i).call();
+    return candidate;
   }
 
  
@@ -154,6 +164,23 @@ class App extends Component {
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
     })
   }
+
+  // view amount of total shares
+  async viewTotalShares(){
+    const totalNumber = await this.state.deployedVoteContract.methods.totalShareNum().call(); 
+    return totalNumber;
+  }
+
+    // view amount of total allocated shares
+    async viewAllocatedShares(){
+      const totalNumber = await this.state.deployedVoteContract.methods.currentTotalShareNum().call(); 
+      return totalNumber;
+    }
+
+    async viewMaxAllocatShares(){
+      const totalNumber = await this.state.deployedVoteContract.methods.maxShareNum().call(); 
+      return totalNumber;
+    }
 
 
 
@@ -178,7 +205,7 @@ class App extends Component {
                 : 
                 <Switch>
                   <Route path="/createCandidate">
-                    <CreateNewCandidate createNewCandidate={this.createNewCandidate} allocateShare={this.allocateShare}/>
+                    <CreateNewCandidate createNewCandidate={this.createNewCandidate} allocateShare={this.allocateShare} viewTotalShares={this.viewTotalShares} viewAllocatedShares={this.viewAllocatedShares} viewMaxAllocatShares={this.viewMaxAllocatShares}/>
                   </Route>
                   <Route path="/myaccount">
                     <MyAccount getMyInfo={this.getMyInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord} changeMyVote={this.changeMyVote}/>                  

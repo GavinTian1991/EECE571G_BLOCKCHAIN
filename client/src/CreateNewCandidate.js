@@ -14,8 +14,16 @@ export default class CreateNewCandidate extends Component{
     this.resetShare = this.resetShare.bind(this);
   }
   
-  initialState = {name:'',photoUrl:'',cadidateInfo:'',address:'',amount:''};
+  initialState = {name:'',photoUrl:'',cadidateInfo:'',address:'',amount:'',availableShare:0,maxShare:0};
 
+  async componentDidMount(){
+    const totalShare = await this.props.viewTotalShares();
+    const allocatedShare = await this.props.viewAllocatedShares();
+    let availableShare  = await totalShare - allocatedShare;
+    this.setState({availableShare});
+    const maxShare = await this.props.viewMaxAllocatShares();
+    this.setState({maxShare});
+  }
 
   submitCandidate = event => {
     event.preventDefault();
@@ -51,6 +59,12 @@ render(){
 
                 
                 <Card.Body>
+                <Card.Text>
+                Current Available Shares:{this.state.availableShare} 
+               </Card.Text>
+               <Card.Text>
+                Max Shares You Can Allocate:{this.state.maxShare}
+               </Card.Text>
                 <Form style={{height: '100%'}} onReset={this.resetProduct} onSubmit={this.submitShare} id="shareFormId">
                     <Form.Row>
                       <Form.Group as={Col} controlId="formGridName">
