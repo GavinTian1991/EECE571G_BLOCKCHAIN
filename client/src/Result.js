@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Chart } from "react-google-charts";
+import {Card} from 'react-bootstrap';
 
 export default class Result extends Component{
     constructor(props){
@@ -17,9 +18,9 @@ export default class Result extends Component{
     
     render(){
         return(
+            <Card>
+                <Card.Body>
             <Chart
-  width={'500px'}
-  height={'300px'}
   chartType="Bar"
   loader={<div>Loading Chart</div>}
   data={this.state.chartData}
@@ -32,6 +33,8 @@ export default class Result extends Component{
   }}
 
 />
+</Card.Body>
+</Card>
         );
     }
 }
