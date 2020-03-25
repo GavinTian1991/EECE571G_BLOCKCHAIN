@@ -1,15 +1,16 @@
 import React, { Component } from "react";
-import {Card,Form, Button, Table,CardDeck,ListGroup,ListGroupItem,Col} from 'react-bootstrap';
+import {Card,Form, Button, Table,CardDeck,ListGroup,ListGroupItem,Col,Popover,OverlayTrigger} from 'react-bootstrap';
 import { Icon } from 'semantic-ui-react';
 
 export default class MyAccount extends Component{
   constructor(props){
      super(props);
-     this.state={account:this.props.account,myInfo:this.initialInfo,record:this.initialRecord};
+     this.state={account:this.props.account,myInfo:this.initialInfo,record:this.initialRecord,names:[]};
     
      this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
      this.infoChange = this.infoChange.bind(this);
      this.submitChangeVote = this.submitChangeVote.bind(this);
+     //this.viewOneCandidateInfo = this.viewOneCandidateInfo.bind(this);
 
   }
   initialInfo={stock:0 ,totalVoteNum:0,voteUsed:0,numOfPeopleNominated:0,voteTime:0};
@@ -26,6 +27,12 @@ export default class MyAccount extends Component{
     const record = await this.props.lookUpVoteRecord();
     await this.setState({record});
    //alert("show record in records:\n candidateId:" + record.myAddr + " Votes: "+ record.voteNum[0]);
+   for(let i=0;i<record.candidateID.length;i++){
+    const candidate = await this.props.viewOneCandidateInfo(record.candidateID[i]);
+    const name = await candidate.candidateName;
+    //alert("set name for id:" + record.candidateID[i] + "name is : " + name);
+    this.setState({names:[...this.state.names,name]});
+   }
   }
 
   infoChange = event =>{
@@ -38,11 +45,26 @@ export default class MyAccount extends Component{
         this.props.changeMyVote(this.state.candidateId,this.state.newVote,this.state.voteInfoNum);
     }
 
+    // viewOneCandidateInfo(id){
+    //     const name = this.props.viewOneCandidateInfo(id).candidateName;
+    //     alert(name);
+    //     return name;
+    // }
+
+
  render(){
+    const popover = (
+        <Popover id="popover-basic">
+          <Popover.Title as="h3">Caution</Popover.Title>
+          <Popover.Content>
+           If you have changed your past voting record and then immediately click this button, the record may not be updated. If so, try again later!
+          </Popover.Content>
+        </Popover>
+      );
      return(
         <CardDeck>
         <Card>
-        <Card.Header><Icon name='plus square' /> My Stock Info</Card.Header>
+        <Card.Header><Icon name='plus square' /> My Basic Info</Card.Header>
           <Card.Body>
           <ListGroup className="list-group-flush">
                 <ListGroupItem>Total Stock: {this.state.myInfo.stock}</ListGroupItem>
@@ -65,6 +87,7 @@ export default class MyAccount extends Component{
 					    <tr>
 					      <th>Vote Record ID</th>
 					      <th>Candidate ID</th>
+                          <th>Candidate Name</th>
 					      <th>Votes</th>
 					      
 					    </tr>
@@ -72,13 +95,14 @@ export default class MyAccount extends Component{
 					  <tbody>
                           {this.state.record.recordID.length === 0 ? 
 							  <tr align="center">
-					           <td colSpan="3"> 0 record avaliable. </td>
+					           <td colSpan="4"> 0 record avaliable. </td>
 					          </tr> : 
                               this.state.record.recordID.map((id) => {
                                   let newID = parseInt(id)+1;
                                 return(<tr>
                                 <td>{newID}</td>
                                 <td>{this.state.record.candidateID[id]}</td>
+                                <td>{this.state.names[id]}</td>
                                 <td>{this.state.record.voteNum[id]}</td>
                                </tr>);
                               })}
@@ -87,9 +111,11 @@ export default class MyAccount extends Component{
 						</Table>
           </Card.Body>
           <Card.Footer>
+          <OverlayTrigger trigger="hover" placement="right" overlay={popover}>
           <Button onClick={this.lookUpVoteRecord}  variant="secondary">
                   <Icon name='search' /> Search My Voting History
          </Button>
+         </OverlayTrigger>
           </Card.Footer>
         </Card>
         <Card>

@@ -107,14 +107,16 @@ class App extends Component {
     let returnResults;
     await this.state.deployedVoteContract.getPastEvents('lookUpMyVote',{
       filter: {myAddr: this.state.account}, 
-      fromBlock: 'latest'
+      fromBlock:0
   }, function(error, events){ 
     
-    returnResults = events[0].returnValues;
-    console.log(events);
+    //returnResults = events[events.length-1].returnValues;
+    //console.log(events);
   }).then(function(events){
     //alert("current block num: "+currentBlockNum+ "show func return result:" + events[0].returnValues.candidateID[0]);
     //returnResults = events[0].returnValues;
+    returnResults = events[events.length-1].returnValues;
+    console.log(events.length);
   });
 
    return returnResults;
@@ -220,7 +222,7 @@ class App extends Component {
                     <CreateNewCandidate createNewCandidate={this.createNewCandidate} allocateShare={this.allocateShare} viewTotalShares={this.viewTotalShares} viewAllocatedShares={this.viewAllocatedShares} viewMaxAllocatShares={this.viewMaxAllocatShares}/>
                   </Route>
                   <Route path="/myaccount">
-                    <MyAccount getMyInfo={this.getMyInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord} changeMyVote={this.changeMyVote}/>                  
+                    <MyAccount getMyInfo={this.getMyInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord} changeMyVote={this.changeMyVote} viewOneCandidateInfo={this.viewOneCandidateInfo}/>                  
                   </Route>
                   <Route path="/gotovote">
                     <ViewCandidates viewAllCandidate={this.viewAllCandidate} voteForCandidate={this.voteForCandidate}/>                  
