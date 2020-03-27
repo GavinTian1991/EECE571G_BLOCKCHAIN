@@ -14,7 +14,7 @@ export default class CreateNewCandidate extends Component{
     this.resetShare = this.resetShare.bind(this);
   }
   
-  initialState = {name:'',photoUrl:'',cadidateInfo:'',address:'',amount:'',availableShare:0,maxShare:0};
+  initialState = {name:'',photoUrl:'',cadidateInfo:'',address:'',amount:'',availableShare:0,maxShare:0,voteSettingDateValid:true};
 
   async componentDidMount(){
     const totalShare = await this.props.viewTotalShares();
@@ -23,6 +23,8 @@ export default class CreateNewCandidate extends Component{
     this.setState({availableShare});
     const maxShare = await this.props.viewMaxAllocatShares();
     this.setState({maxShare});
+    const voteSettingDateValid = await this.props.checkVoteSettingDate();
+    await this.setState({voteSettingDateValid});
   }
 
   submitCandidate = event => {
@@ -87,7 +89,7 @@ render(){
                         className={"bg-light"} placeholder="Enter the amount of stock you want to allocate" />
                       </Form.Group>
                     </Form.Row>
-                    <Button size="sm" variant="success" type="submit">
+                    <Button size="sm" variant="success" type="submit" disabled={!this.state.voteSettingDateValid}>
                   <Icon name='save' /> Submit
                   </Button>{" "}
                   <Button size="sm" variant="info" type="reset">
@@ -141,7 +143,7 @@ render(){
                    
                 </Card.Body>
                 <Card.Footer style={{"textAlign":"right"}}>
-                  <Button size="sm" variant="success" type="submit">
+                  <Button size="sm" variant="success" type="submit" disabled={!this.state.voteSettingDateValid}>
                   <Icon name='save' /> Submit
                   </Button>{" "}
                   <Button size="sm" variant="info" type="reset">

@@ -5,7 +5,7 @@ import { Icon } from 'semantic-ui-react';
 export default class MyAccount extends Component{
   constructor(props){
      super(props);
-     this.state={account:this.props.account,myInfo:this.initialInfo,record:this.initialRecord,names:[]};
+     this.state={account:this.props.account,myInfo:this.initialInfo,record:this.initialRecord,names:[],voteDateValid:true};
     
      this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
      this.infoChange = this.infoChange.bind(this);
@@ -21,6 +21,8 @@ export default class MyAccount extends Component{
   async componentDidMount(){
     const myInfomation = await this.props.getMyInfo(this.state.account);
     this.setState({myInfo:myInfomation});
+    const voteDateValid = await this.props.checkVoteDate();
+    await this.setState({voteDateValid});
   }
 
   async lookUpVoteRecord(){
@@ -158,7 +160,7 @@ export default class MyAccount extends Component{
           </Card.Body>
           
           <Card.Footer>
-          <Button size="sm" variant="success" type="submit">
+          <Button size="sm" variant="success" type="submit" disabled={!this.state.voteDateValid}>
                   <Icon name='save' /> Confirm
                   </Button>{" "}
           </Card.Footer>
