@@ -9,13 +9,9 @@ import TestPage from './TestPage.js';
 import ViewCandidates from './ViewCandidates.js'; 
 import Result from './Result.js';
 import "./App.css";
-
-
-
 class App extends Component {
   constructor(props){
      super(props);
-     
      this.state = {
       account: '', // the account here is the account in metamask, so this is why we should reload the page after add an account
       totalCandidate: 0,
@@ -31,15 +27,10 @@ class App extends Component {
     this.createNewCandidate = this.createNewCandidate.bind(this);
     this.viewAllCandidate = this.viewAllCandidate.bind(this);
 
-
     this.allocateShare = this.allocateShare.bind(this);
     this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
     this.voteForCandidate = this.voteForCandidate.bind(this);
-
     this.getMyInfo = this.getMyInfo.bind(this);
-    this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
-
-
   }
 
   async componentDidMount(){
@@ -71,18 +62,16 @@ class App extends Component {
       this.setState({deployedVoteContract: deployedVoteContract}); // add the contract to state
       this.setState({loading: false})
     } else {
-      window.alert('Ethbay contract is not found in your blockchain.')
+      window.alert('Ethbay contract is not found in your blockchain.');
     }
-  
   }
   // the func below call the solidity func
-
   async changeMyVote(candidateId,newVote,voteInfoNum){
     this.setState ({loading: true})
     this.state.deployedVoteContract.methods.changeMyVote(candidateId,newVote,voteInfoNum,309).send({from: this.state.account})
     .once('receipt', (receipt)=> {
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
-    })
+    });
   }
   
   // call the voters()
@@ -93,31 +82,25 @@ class App extends Component {
 
   //call lookUpVoteRecord()
   async lookUpVoteRecord(){
-
     this.state.deployedVoteContract.methods.lookUpVoteRecord().send({from: this.state.account});
-
-    const web3 = window.web3; //first get web3
     //const currentBlockNum = await web3.eth.getBlockTransactionCount("latest");
     let returnResults;
     await this.state.deployedVoteContract.getPastEvents('lookUpMyVote',{
       filter: {myAddr: this.state.account}, 
       fromBlock: 'latest'
   }, function(error, events){ 
-    
     returnResults = events[0].returnValues;
     console.log(events);
   }).then(function(events){
     //alert("current block num: "+currentBlockNum+ "show func return result:" + events[0].returnValues.candidateID[0]);
     //returnResults = events[0].returnValues;
   });
-
-   return returnResults;
+    return returnResults;
   }
 
   //call createNewCandidate(). For now current time is just a constant. Future direction will change to the real current time
   async createNewCandidate(name,photoURL,candidateInfo){
     this.setState ({loading: true});
-
     this.state.deployedVoteContract.methods.createNewCandidate(name,photoURL,candidateInfo,109).send({from: this.state.account})
     .once('receipt', (receipt)=> {
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
@@ -136,15 +119,30 @@ class App extends Component {
     return candidates;
   }
 
- 
+  async contractMessage(eventName){
+    await this.state.deployedVoteContract.getPastEvents(eventName,{
+      fromBlock: 'latest'
+      }, function(error, events){ 
+        if(eventName === 'errorMessage'){
+          window.alert(events[0].returnValues.errMsg);
+        }
+        if(eventName === 'allocateShareEvent'){
+          window.alert('Share Allocation Finished!');
+        }
+    });
+  }
 
   async allocateShare(address,shareHold){
     this.setState ({loading: true});
-    alert("gas amount OK, start call fun");
+    //alert("gas amount OK, start call fun");
     this.state.deployedVoteContract.methods.allocateShare(address,shareHold).send({from: this.state.account})
-    .once('receipt', (receipt)=> {
-      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
-    })
+    .once('receipt', async (receipt) => {
+      let eventsName = Object.keys(receipt.events);
+      await this.contractMessage(eventsName[0]);
+      this.setState({loading: false}) // in public blockchain, it may take 10 min to receive the receipt
+    }).on('error', async (error) => { 
+      console.log(error)
+    });
   }
 
   async voteForCandidate(candidateId,voteNum){
@@ -155,10 +153,6 @@ class App extends Component {
     })
   }
 
-
-
- 
-  
   render() {
     return (
       <Router>
@@ -167,7 +161,6 @@ class App extends Component {
         <div>
           <h1>Welcome</h1>
         {"Your Address: " + this.state.account}
-        
         </div>
               { this.state.loading 
                 ? 
@@ -175,7 +168,7 @@ class App extends Component {
                 : 
                 <Switch>
                   <Route path="/createCandidate">
-                    <CreateNewCandidate createNewCandidate={this.createNewCandidate} allocateShare={this.allocateShare}/>
+                    <CreateNewCandidate createNewCandidate={this.createNewCandidate} allocateShare={this.allocateShare.bind(this)}/>
                   </Route>
                   <Route path="/myaccount">
                     <MyAccount getMyInfo={this.getMyInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord} changeMyVote={this.changeMyVote}/>                  

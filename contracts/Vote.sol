@@ -78,7 +78,10 @@ contract Vote {
         uint[] recordID,
         uint[] candidateID,
         uint[] voteNum
-        );
+    );
+    event errorMessage(
+        string errMsg
+    );
 // voting process
 // 1. define the candidate, candidate modifying period, voting period, max Nominating Num, total stock, max stock, and voting type
 // 2. deployer allocate the share of each voters, voter without any share cannot vote
@@ -124,7 +127,11 @@ contract Vote {
     // the share of one voter should not greater than max share amount that a voter can hold
     // the currentTotalShareNum + _stockNum should not greater than total share available
     function allocateShare(address _voterAddr, uint _shareNum) public {
-        require(msg.sender == voteDeployer, "You can't deploy stock. Only deployer can do this.");
+        require(msg.sender == voteDeployer, "You can't deploy share. Only deployer can do this.");
+        if(_shareNum > maxShareNum){
+            emit errorMessage("You can't deploy this share because it is over max share per person");
+            return;
+        }
         require(_shareNum <= maxShareNum, "You can't deploy this stock number for this voter.");
         require((currentTotalShareNum + _shareNum) <= totalShareNum, "You can't deploy more stock, current stock are greater than total stock.");
         // add to currentTotalShareNum
