@@ -112,9 +112,17 @@ contract Vote {
    // current time should be within the creating new cadidate period
     function createNewCandidate(string memory _cadidateName, string memory _candidatePhoto,
                                 string memory _cadidateInfo, uint256 _currentDate) public {
+        if(msg.sender != voteDeployer) {
+            emit errorMessage("You can't create new cadidate. Only deployer can do this.");
+            return;
+        }
         require(msg.sender == voteDeployer, "You can't create new cadidate. Only deployer can do this.");
+        if(_currentDate < addCandidateStartDate || _currentDate > addCandidateEndDate) {
+            emit errorMessage("Invalid adding time, no candidate can be added.");
+            return;
+        }
         require(_currentDate > addCandidateStartDate && _currentDate < addCandidateEndDate,
-                "The stage for adding new candiddate is not valid, no candidate can be added");
+                "Invalid adding time, no candidate can be added.");
         require(bytes(_cadidateName).length > 0, "candidate name is required");
         require(bytes(_cadidateInfo).length > 0, "candidate info is required");
         totalCandidateNumber++;
@@ -127,14 +135,23 @@ contract Vote {
     // the share of one voter should not greater than max share amount that a voter can hold
     // the currentTotalShareNum + _stockNum should not greater than total share available
     function allocateShare(address _voterAddr, uint _shareNum) public {
+        if(msg.sender != voteDeployer) {
+            emit errorMessage("You can't deploy share. Only deployer can do this.");
+            return;
+        }
         require(msg.sender == voteDeployer, "You can't deploy share. Only deployer can do this.");
         if(_shareNum > maxShareNum){
-            emit errorMessage("You can't deploy this share because it is over max share per person");
+            emit errorMessage("You can't deploy this share because it is over max share per person.");
             return;
         }
         require(_shareNum <= maxShareNum, "You can't deploy this stock number for this voter.");
-        require((currentTotalShareNum + _shareNum) <= totalShareNum, "You can't deploy more stock, current stock are greater than total stock.");
-        // add to currentTotalShareNum
+        if((currentTotalShareNum + _shareNum) > totalShareNum) {
+            emit errorMessage("You can't deploy more share, current share is over total share limit.");
+            return;
+        }
+        require((currentTotalShareNum + _shareNum) <= totalShareNum,
+        "You can't deploy more share, current share is over total share limit.");
+        //add to currentTotalShareNum
         currentTotalShareNum = currentTotalShareNum + _shareNum;
         Voter memory _voter = voters[_voterAddr];
         _voter.stock = _shareNum;
@@ -155,21 +172,51 @@ contract Vote {
     // if voter has stock then he can voteForCandidate
     // if voter still has votes left he can vote
 
-    function voteForCandidate(uint _candidateId, uint _voteNum, uint256 _currentDate) public{
+    function voteForCandidate(uint _candidateId, uint _voteNum, uint256 _currentDate) public {
+        if(_currentDate < voteStartDate || _currentDate > voteEndDate) {
+            emit errorMessage("Invalid adding time, no vote can be created.");
+            return;
+        }
         require(_currentDate > voteStartDate && _currentDate < voteEndDate,
-        "The stage for voting is not valid, no vote can be created");
-        require(_candidateId > 0 && _candidateId <= totalCandidateNumber, "Invalid Candidate Id");
+        "Invalid adding time, no vote can be created.");
+        if(_candidateId < 0 || _candidateId > totalCandidateNumber) {
+            emit errorMessage("Invalid Candidate Id.");
+            return;
+        }
+        require(_candidateId > 0 && _candidateId <= totalCandidateNumber, "Invalid Candidate Id.");
+        if (voters[msg.sender].voteChangeNum >= 3) {
+            emit errorMessage("You have access your max voting modifying times(3 times).");
+            return;
+        }
         require(voters[msg.sender].hasVoted == false || voters[msg.sender].voteChangeNum < 3,
-        'You have access your max voting modifying times(3 times)');
-        require(voters[msg.sender].stock > 0, "You don't have any share. You can't vote");
-        require(voters[msg.sender].numOfPeopleNominated <= maxNominatedNum, "You can't vote for any more nominator. You can't vote");
+        "You have access your max voting modifying times(3 times).");
+        if(voters[msg.sender].stock <= 0) {
+            emit errorMessage("You don't have any share. You can't vote.");
+            return;
+        }
+        require(voters[msg.sender].stock > 0, "You don't have any share. You can't vote.");
+        if(voters[msg.sender].numOfPeopleNominated > maxNominatedNum) {
+            emit errorMessage("You can't vote for any more nominator. You can't vote.");
+            return;
+        }
+        require(voters[msg.sender].numOfPeopleNominated <= maxNominatedNum,
+        "You can't vote for any more nominator. You can't vote.");
         // get the last voting info
         Voter memory _voter = voters[msg.sender];
         // still has votes left?
         if(voteType == 1){
-            require(_voter.voteUsed + voters[msg.sender].stock <= _voter.totalVoteNum, "You don't have so many votes");
-        }else{
-            require(_voter.voteUsed + _voteNum <= _voter.totalVoteNum, "You don't have so many votes");
+            if(_voter.voteUsed + voters[msg.sender].stock > _voter.totalVoteNum) {
+                emit errorMessage("You don't have enough votes.");
+                return;
+            }
+            require(_voter.voteUsed + voters[msg.sender].stock <= _voter.totalVoteNum,
+            "You don't have enough votes.");
+        } else {
+            if(_voter.voteUsed + _voteNum > _voter.totalVoteNum) {
+                emit errorMessage("You don't have enough votes.");
+                return;
+            }
+            require(_voter.voteUsed + _voteNum <= _voter.totalVoteNum, "You don't have enough votes.");
         }
         // check wether you have voted for this candidates or not
         bool votedForCandidate = false;
@@ -179,8 +226,12 @@ contract Vote {
                 votedForCandidate = true;
              }
         }
+        if(votedForCandidate) {
+            emit errorMessage("You have voted for this candidate.");
+            return;
+        }
         require(!votedForCandidate,
-            "You have voted for this candidate, use changeMyVote() to change your vote");
+            "You have voted for this candidate.");
          // then lets input the new voting info
         voters[msg.sender].numOfPeopleNominated++;
         voters[msg.sender].hasVoted = true;
@@ -224,11 +275,33 @@ contract Vote {
     // after that it will add the vote to the new candidate you want to vote
     // this func won't change the numOfPeopleNominated
     function changeMyVote(uint _candidateId, uint _newVote, uint _voteInfoNum, uint256 _currentDate) public {
-        require(_currentDate > voteStartDate && _currentDate < voteEndDate, "The stage for voting is not valid, no vote can be created");
-        require(_candidateId > 0 && _candidateId <= totalCandidateNumber, 'Invalid Candidate Id');
+        if(_currentDate < voteStartDate || _currentDate > voteEndDate) {
+            emit errorMessage("Invalid adding time, no vote can be created.");
+            return;
+        }
+        require(_currentDate > voteStartDate && _currentDate < voteEndDate,
+        "Invalid adding time, no vote can be created.");
+        if(_candidateId < 0 || _candidateId > totalCandidateNumber) {
+            emit errorMessage("Invalid Candidate Id.");
+            return;
+        }
+        require(_candidateId > 0 && _candidateId <= totalCandidateNumber, "Invalid Candidate Id.");
+        if(voters[msg.sender].hasVoted == false) {
+            emit errorMessage("You have not voted any candidates.");
+            return;
+        }
+        if(voters[msg.sender].voteChangeNum >= 3) {
+            emit errorMessage("You have access your max vote modifying times(3 times).");
+            return;
+        }
         require(voters[msg.sender].hasVoted == true && voters[msg.sender].voteChangeNum < 3,
-        'You have access your max voting modifying times(3 times)');
-        require(voters[msg.sender].myVote[_voteInfoNum - 1].voteNum > 0, "voting info ID is wrong, you haven't voted for this person");
+        "You have access your max vote modifying times(3 times).");
+        if(voters[msg.sender].myVote[_voteInfoNum - 1].voteNum <= 0) {
+            emit errorMessage("Voting info ID is wrong, you haven't voted for this candidate.");
+            return;
+        }
+        require(voters[msg.sender].myVote[_voteInfoNum - 1].voteNum > 0,
+        "Voting info ID is wrong, you haven't voted for this candidate.");
         // get the last voting info
         Voter memory _voter = voters[msg.sender];
         OneVote memory _voteToModify = voters[msg.sender].myVote[_voteInfoNum - 1];
@@ -236,17 +309,25 @@ contract Vote {
         // total voteUsed checking
         if(voteType == 2) {
             uint myLastVoteNum = _voteToModify.voteNum;
-            require(_voter.voteUsed - myLastVoteNum + _newVote <= _voter.totalVoteNum, "You don't have so many votes");
+            if(_voter.voteUsed - myLastVoteNum + _newVote > _voter.totalVoteNum) {
+                emit errorMessage("You don't have enough votes.");
+                return;
+            }
+            require(_voter.voteUsed - myLastVoteNum + _newVote <= _voter.totalVoteNum, "You don't have enough votes.");
         } else {
             // if you have vote for this candidate then don't vote, cuz in type 1 every candidate can only be voted once
            bool votedForCandidate = false;
            for(uint i = 0; i <= voters[msg.sender].numOfPeopleNominated; i++){
-            //emit lookForInfo(voters[msg.sender].myVote[i].candidateId,_candidateId);
-            if(voters[msg.sender].myVote[i].candidateId == _candidateId && voters[msg.sender].myVote[i].voteNum > 0) {
-                votedForCandidate = true;
-             }
-             require(!votedForCandidate, "You have voted for this candidate.");
-            }
+                //emit lookForInfo(voters[msg.sender].myVote[i].candidateId,_candidateId);
+                if(voters[msg.sender].myVote[i].candidateId == _candidateId && voters[msg.sender].myVote[i].voteNum > 0) {
+                    votedForCandidate = true;
+                }
+           }
+           if(votedForCandidate) {
+                emit errorMessage("You have voted for this candidate.");
+                return;
+           }
+           require(!votedForCandidate, "You have voted for this candidate.");
         }
         // now start to modify
         voters[msg.sender].voteChangeNum++;

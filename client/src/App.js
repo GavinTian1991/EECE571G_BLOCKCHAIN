@@ -22,12 +22,11 @@ class App extends Component {
     this.getWeb3Provider = this.getWeb3Provider.bind(this);
     this.connectToBlockchain = this.connectToBlockchain.bind(this);
 
-    this.changeMyVote = this.changeMyVote.bind(this);
-
     this.createNewCandidate = this.createNewCandidate.bind(this);
+    this.allocateShare = this.allocateShare.bind(this);
+    this.changeMyVote = this.changeMyVote.bind(this);
     this.viewAllCandidate = this.viewAllCandidate.bind(this);
 
-    this.allocateShare = this.allocateShare.bind(this);
     this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
     this.voteForCandidate = this.voteForCandidate.bind(this);
     this.getMyInfo = this.getMyInfo.bind(this);
@@ -65,11 +64,71 @@ class App extends Component {
       window.alert('Ethbay contract is not found in your blockchain.');
     }
   }
+
+  //Give window alert based on event type
+  async contractMessage(eventName){
+    await this.state.deployedVoteContract.getPastEvents(eventName,{
+      fromBlock: 'latest'
+      }, function(error, events){ 
+        if(eventName === 'errorMessage'){
+          window.alert(events[0].returnValues.errMsg);
+        }
+        if(eventName === 'allocateShareEvent') {
+          window.alert('Share Allocation Finished!');
+        }
+        if(eventName == 'addCandidate') {
+          window.alert('Add Candidate Finished!');
+        }
+        if(eventName == 'newVoteRecord') {
+          window.alert('Vote Candidate Finished!');
+        }
+        if(eventName == 'changeVoteRecord') {
+          window.alert('Change vote Finished!');
+        }
+    });
+  }
+
+  //call createNewCandidate(). For now current time is just a constant. Future direction will change to the real current time
+  async createNewCandidate(name,photoURL,candidateInfo){
+    this.setState ({loading: true});
+    this.state.deployedVoteContract.methods.createNewCandidate(name,photoURL,candidateInfo,150).send({from: this.state.account})
+    .once('receipt', async (receipt)=> {
+      let eventsName = Object.keys(receipt.events);
+      await this.contractMessage(eventsName[0]);
+      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
+    })
+  }
+
+  async allocateShare(address,shareHold){
+    this.setState ({loading: true});
+    //alert("gas amount OK, start call fun");
+    this.state.deployedVoteContract.methods.allocateShare(address,shareHold).send({from: this.state.account})
+    .once('receipt', async (receipt) => {
+      let eventsName = Object.keys(receipt.events);
+      await this.contractMessage(eventsName[0]);
+      this.setState({loading: false}) // in public blockchain, it may take 10 min to receive the receipt
+    }).on('error', async (error) => { 
+      console.log(error)
+    });
+  }
+
+  async voteForCandidate(candidateId,voteNum){
+    this.setState ({loading: true})
+    this.state.deployedVoteContract.methods.voteForCandidate(candidateId,voteNum,309).send({from: this.state.account})
+    .once('receipt', async (receipt)=> {
+      let eventsName = Object.keys(receipt.events);
+      await this.contractMessage(eventsName[0]);
+      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
+    })
+  }
+
   // the func below call the solidity func
   async changeMyVote(candidateId,newVote,voteInfoNum){
     this.setState ({loading: true})
     this.state.deployedVoteContract.methods.changeMyVote(candidateId,newVote,voteInfoNum,309).send({from: this.state.account})
-    .once('receipt', (receipt)=> {
+    .once('receipt', async (receipt)=> {
+      let eventsName = Object.keys(receipt.events);
+      await this.contractMessage(eventsName[0]);
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
     });
   }
@@ -98,15 +157,6 @@ class App extends Component {
     return returnResults;
   }
 
-  //call createNewCandidate(). For now current time is just a constant. Future direction will change to the real current time
-  async createNewCandidate(name,photoURL,candidateInfo){
-    this.setState ({loading: true});
-    this.state.deployedVoteContract.methods.createNewCandidate(name,photoURL,candidateInfo,109).send({from: this.state.account})
-    .once('receipt', (receipt)=> {
-      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
-    })
-  }
-
  //call viewAllCandidate(). Can return an array containing item obj
   async viewAllCandidate(){
     const totalNumber = await this.state.deployedVoteContract.methods.totalCandidateNumber().call(); 
@@ -117,40 +167,6 @@ class App extends Component {
         candidates[i] = candidate; // append the item into the existing item array
     }
     return candidates;
-  }
-
-  async contractMessage(eventName){
-    await this.state.deployedVoteContract.getPastEvents(eventName,{
-      fromBlock: 'latest'
-      }, function(error, events){ 
-        if(eventName === 'errorMessage'){
-          window.alert(events[0].returnValues.errMsg);
-        }
-        if(eventName === 'allocateShareEvent'){
-          window.alert('Share Allocation Finished!');
-        }
-    });
-  }
-
-  async allocateShare(address,shareHold){
-    this.setState ({loading: true});
-    //alert("gas amount OK, start call fun");
-    this.state.deployedVoteContract.methods.allocateShare(address,shareHold).send({from: this.state.account})
-    .once('receipt', async (receipt) => {
-      let eventsName = Object.keys(receipt.events);
-      await this.contractMessage(eventsName[0]);
-      this.setState({loading: false}) // in public blockchain, it may take 10 min to receive the receipt
-    }).on('error', async (error) => { 
-      console.log(error)
-    });
-  }
-
-  async voteForCandidate(candidateId,voteNum){
-    this.setState ({loading: true})
-    this.state.deployedVoteContract.methods.voteForCandidate(candidateId,voteNum,309).send({from: this.state.account})
-    .once('receipt', (receipt)=> {
-      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
-    })
   }
 
   render() {
