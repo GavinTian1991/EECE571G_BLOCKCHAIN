@@ -147,23 +147,18 @@ class App extends Component {
     return myInfo;
   }
 
-  //call lookUpVoteRecord()
   async lookUpVoteRecord(){
     this.state.deployedVoteContract.methods.lookUpVoteRecord().send({from: this.state.account});
-    //const currentBlockNum = await web3.eth.getBlockTransactionCount("latest");
     let returnResults;
     await this.state.deployedVoteContract.getPastEvents('lookUpMyVote',{
-      filter: {myAddr: this.state.account}, 
-      fromBlock: 'latest'
-  }, function(error, events){ 
-    returnResults = events[0].returnValues;
-    console.log(events);
-  }).then(function(events){
-    //alert("current block num: "+currentBlockNum+ "show func return result:" + events[0].returnValues.candidateID[0]);
-    //returnResults = events[0].returnValues;
-  });
-    return returnResults;
-  }
+          filter: {myAddr: this.state.account}, 
+          fromBlock: 0
+          }, function(error, events) { 
+            }).then(function(events) {
+                  returnResults = events[events.length - 1].returnValues;
+              });
+        return returnResults;
+    }
 
  //call viewAllCandidate(). Can return an array containing item obj
   async viewAllCandidate(){
@@ -229,7 +224,8 @@ class App extends Component {
                         viewTotalShares={this.viewTotalShares} viewAllocatedShares={this.viewAllocatedShares} viewMaxAllocatShares={this.viewMaxAllocatShares}/>
                   </Route>
                   <Route path="/myaccount">
-                    <MyAccount getMyInfo={this.getMyInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord} changeMyVote={this.changeMyVote}/>                  
+                    <MyAccount getMyInfo={this.getMyInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord} 
+                               changeMyVote={this.changeMyVote} viewOneCandidateInfo={this.viewOneCandidateInfo}/>                  
                   </Route>
                   <Route path="/gotovote">
                     <ViewCandidates viewAllCandidate={this.viewAllCandidate} voteForCandidate={this.voteForCandidate}/>                  

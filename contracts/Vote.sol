@@ -254,6 +254,10 @@ contract Vote {
     // this func can let you look up all the vote records
     function lookUpVoteRecord() public{
         uint num_p = voters[msg.sender].numOfPeopleNominated;
+        if(num_p == 0) {
+            emit errorMessage("You have not voted for any candidates yet, no vote record.");
+            return;
+        }
         uint256[] memory recordID = new uint256[](num_p);
         uint256[] memory candidateID = new uint256[](num_p);
         uint256[] memory voteNum = new uint256[](num_p);
