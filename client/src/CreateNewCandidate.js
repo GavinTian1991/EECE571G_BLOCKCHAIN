@@ -14,20 +14,26 @@ export default class CreateNewCandidate extends Component{
     this.resetShare = this.resetShare.bind(this);
   }
   
-  initialState = {name:'',photoUrl:'',cadidateInfo:'',address:'',amount:''};
+  initialState = {name:'',photoUrl:'',cadidateInfo:'',address:'',amount:'',availableShare:0,maxShare:0};
 
+  async componentDidMount(){
+    const totalShare = await this.props.viewTotalShares();
+    const allocatedShare = await this.props.viewAllocatedShares();
+    let availableShare  = await totalShare - allocatedShare;
+    this.setState({availableShare});
+    const maxShare = await this.props.viewMaxAllocatShares();
+    this.setState({maxShare});
+  }
 
   submitCandidate = event => {
     event.preventDefault();
     this.props.createNewCandidate(this.state.name,this.state.photoUrl,this.state.cadidateInfo);
-    
     this.setState({name:'',photoUrl:'',cadidateInfo:''});
    }
 
    submitShare = event => {
     event.preventDefault();
     this.props.allocateShare(this.state.address,this.state.amount);
-    
     this.setState({address:'',amount:''});
    }
 
@@ -47,10 +53,14 @@ render(){
     return(
       <CardDeck>
             <Card>
-                <Card.Header><Icon name='plus square' /> Split Share</Card.Header>
-
-                
+                <Card.Header><Icon name='plus square' /> Split Share</Card.Header>                
                 <Card.Body>
+                 <Card.Text>
+                  Current Total Available Shares:{this.state.availableShare} 
+                 </Card.Text>
+                 <Card.Text>
+                  Max Shares You Can Allocate:{this.state.maxShare}
+                 </Card.Text>
                 <Form style={{height: '100%'}} onReset={this.resetProduct} onSubmit={this.submitShare} id="shareFormId">
                     <Form.Row>
                       <Form.Group as={Col} controlId="formGridName">
@@ -64,13 +74,13 @@ render(){
                             placeholder="Enter the shareholder's address" />
                       </Form.Group>
                       <Form.Group as={Col} controlId="formGridColor">
-                        <Form.Label>Equity</Form.Label>
+                        <Form.Label>Share Equity</Form.Label>
                         <Form.Control autoComplete="off" 
                         type="text" 
                         name="amount"
                         value={this.state.amount}
                         onChange={this.infoChange}
-                        className={"bg-light"} placeholder="Enter the amount of stock you want to allocate" />
+                        className={"bg-light"} placeholder="Enter the amount of share you want to allocate" />
                       </Form.Group>
                     </Form.Row>
                     <Button size="sm" variant="success" type="submit">
@@ -91,7 +101,6 @@ render(){
                 <Card.Header><Icon name='plus square' /> Add Candidate</Card.Header>
                 <Form onReset={this.resetProduct} onSubmit={this.submitCandidate} id="candidateFormId">
                 <Card.Body>
-                
                     <Form.Row>
                       <Form.Group as={Col} controlId="formGridName">
                         <Form.Label>Name</Form.Label>
@@ -124,7 +133,6 @@ render(){
                         className={"bg-light"} placeholder="Enter cadidate Info" />
                       </Form.Group>                   
                     </Form.Row>
-                   
                 </Card.Body>
                 <Card.Footer style={{"textAlign":"right"}}>
                   <Button size="sm" variant="success" type="submit">
@@ -137,7 +145,6 @@ render(){
                 </Form>
             </Card>
           </CardDeck>
-            
     );
 }
 

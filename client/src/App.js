@@ -30,6 +30,11 @@ class App extends Component {
     this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
     this.voteForCandidate = this.voteForCandidate.bind(this);
     this.getMyInfo = this.getMyInfo.bind(this);
+
+    this.viewOneCandidateInfo = this.viewOneCandidateInfo.bind(this);
+    this.viewTotalShares = this.viewTotalShares.bind(this);
+    this.viewAllocatedShares = this.viewAllocatedShares.bind(this);
+    this.viewMaxAllocatShares = this.viewMaxAllocatShares.bind(this);
   }
 
   async componentDidMount(){
@@ -76,13 +81,13 @@ class App extends Component {
         if(eventName === 'allocateShareEvent') {
           window.alert('Share Allocation Finished!');
         }
-        if(eventName == 'addCandidate') {
+        if(eventName === 'addCandidate') {
           window.alert('Add Candidate Finished!');
         }
-        if(eventName == 'newVoteRecord') {
+        if(eventName === 'newVoteRecord') {
           window.alert('Vote Candidate Finished!');
         }
-        if(eventName == 'changeVoteRecord') {
+        if(eventName === 'changeVoteRecord') {
           window.alert('Change vote Finished!');
         }
     });
@@ -169,6 +174,29 @@ class App extends Component {
     return candidates;
   }
 
+  //Can return an item obj containing one candidate info
+  async viewOneCandidateInfo(i){
+    const candidate = await this.state.deployedVoteContract.methods.candidates(i).call();
+    return candidate;
+  }
+
+  // view amount of total shares
+  async viewTotalShares(){
+    const totalNumber = await this.state.deployedVoteContract.methods.totalShareNum().call(); 
+    return totalNumber;
+  }
+  
+    // view amount of total allocated shares
+    async viewAllocatedShares(){
+      const totalNumber = await this.state.deployedVoteContract.methods.currentTotalShareNum().call(); 
+      return totalNumber;
+    }
+  
+    async viewMaxAllocatShares(){
+      const totalNumber = await this.state.deployedVoteContract.methods.maxShareNum().call(); 
+      return totalNumber;
+    }
+
   render() {
     return (
       <Router>
@@ -184,7 +212,8 @@ class App extends Component {
                 : 
                 <Switch>
                   <Route path="/createCandidate">
-                    <CreateNewCandidate createNewCandidate={this.createNewCandidate} allocateShare={this.allocateShare.bind(this)}/>
+                    <CreateNewCandidate createNewCandidate={this.createNewCandidate} allocateShare={this.allocateShare} 
+                        viewTotalShares={this.viewTotalShares} viewAllocatedShares={this.viewAllocatedShares} viewMaxAllocatShares={this.viewMaxAllocatShares}/>
                   </Route>
                   <Route path="/myaccount">
                     <MyAccount getMyInfo={this.getMyInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord} changeMyVote={this.changeMyVote}/>                  
