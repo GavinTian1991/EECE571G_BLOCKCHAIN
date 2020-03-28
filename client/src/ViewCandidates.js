@@ -5,7 +5,7 @@ import { Icon } from 'semantic-ui-react';
 export default class ViewCandidates extends Component{
     constructor(props){
         super(props);
-        this.state={candidates:[]};
+        this.state={candidates:[],voteDateValid:true};
         this.voteForCandidate = this.voteForCandidate.bind(this);
         this.infoChange = this.infoChange.bind(this);
     }
@@ -13,6 +13,8 @@ export default class ViewCandidates extends Component{
     async componentDidMount(){
         const candidates = await this.props.viewAllCandidate();
         await this.setState({candidates});
+        const voteDateValid = await this.props.checkVoteDate();
+        await this.setState({voteDateValid});
     }
 
     infoChange = event =>{
@@ -67,7 +69,7 @@ export default class ViewCandidates extends Component{
                                                 placeholder="Enter the Number of votes" />
                                             </Col>
                                         </Form.Group>
-                                        <Button onClick={this.voteForCandidate}  variant="secondary" type="submit">
+                                        <Button onClick={this.voteForCandidate}  variant="secondary" type="submit" disabled={!this.state.voteDateValid}>
                                                 <Icon name='hand paper outline'/> Vote
                                         </Button>
                                         </Form>
