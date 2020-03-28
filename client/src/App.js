@@ -35,6 +35,9 @@ class App extends Component {
     this.viewTotalShares = this.viewTotalShares.bind(this);
     this.viewAllocatedShares = this.viewAllocatedShares.bind(this);
     this.viewMaxAllocatShares = this.viewMaxAllocatShares.bind(this);
+
+    this.getMaxNominatedNum = this.getMaxNominatedNum.bind(this);
+    this.getVoteType = this.getVoteType.bind(this);
   }
 
   async componentDidMount(){
@@ -197,6 +200,16 @@ class App extends Component {
       return totalNumber;
     }
 
+    async getMaxNominatedNum(){
+      const maxNumber = await this.state.deployedVoteContract.methods.maxNominatedNum().call(); 
+      return maxNumber;
+    }
+
+    async getVoteType(){
+      const voteType = await this.state.deployedVoteContract.methods.voteType().call(); 
+      return voteType;
+    }
+
   render() {
     return (
       <Router>
@@ -225,7 +238,7 @@ class App extends Component {
                     <Result viewAllCandidate={this.viewAllCandidate}/>                  
                   </Route>
                   <Route path="/">
-                  <TestPage/>   
+                  <TestPage getMaxNominatedNum={this.getMaxNominatedNum} getVoteType={this.getVoteType}/>    
                   </Route>
                 </Switch>
                   }

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Chart } from "react-google-charts";
+import {Card} from 'react-bootstrap';
 
 export default class Result extends Component{
     constructor(props){
@@ -17,21 +18,22 @@ export default class Result extends Component{
     
     render(){
         return(
+            <Card>
+            <Card.Body>
             <Chart
-  width={'500px'}
-  height={'300px'}
-  chartType="Bar"
-  loader={<div>Loading Chart</div>}
-  data={this.state.chartData}
-  options={{
-    // Material design options
-    chart: {
-      title: 'Current Voting Result',
-      subtitle: 'Hover onto the bars to see actual number',
-    },
-  }}
-
-/>
+                chartType="Bar"
+                loader={<div>Loading Chart</div>}
+                data={this.state.chartData}
+                options={{
+                    // Material design options
+                    chart: {
+                    title: 'Current Voting Result',
+                    subtitle: 'Hover onto the bars to see actual number',
+                    },
+                }}
+                />
+            </Card.Body>
+            </Card>
         );
     }
 }
