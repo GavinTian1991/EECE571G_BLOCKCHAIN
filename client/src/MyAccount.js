@@ -5,7 +5,8 @@ import { Icon } from 'semantic-ui-react';
 export default class MyAccount extends Component{
   constructor(props){
      super(props);
-     this.state={account:this.props.account,myInfo:this.initialInfo,record:this.initialRecord,names:[], voteDateValid:true};
+     this.state={account:this.props.account,myInfo:this.initialInfo,record:this.initialRecord,names:[], 
+                 voteDateValid:true, lookUpService: true};
     
      this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
      this.infoChange = this.infoChange.bind(this);
@@ -15,12 +16,14 @@ export default class MyAccount extends Component{
   initialInfo={stock:0 ,totalVoteNum:0,voteUsed:0,numOfPeopleNominated:0,voteTime:0};
   initialRecord={myAddr:"",recordID:[],candidateID:[],voteNum:[]};
   // call the voters()
-
   async componentDidMount(){
-    const myInfomation = await this.props.getMyInfo(this.state.account);
+    const myInfomation = await this.props.viewOneVoterInfo(this.state.account);
     this.setState({myInfo:myInfomation});
     const voteDateValid = await this.props.checkVoteDate(1);
     this.setState({voteDateValid});
+    if(this.state.myInfo.numOfPeopleNominated == 0) {
+      this.setState({lookUpService:false});
+    }
   }
 
   async lookUpVoteRecord(){
@@ -98,13 +101,12 @@ export default class MyAccount extends Component{
                                 <td>{this.state.record.voteNum[id]}</td>
                                </tr>);
                               })}
-
                       </tbody>
 						</Table>
           </Card.Body>
           <Card.Footer>
             <OverlayTrigger trigger="hover" placement="right" overlay={popover}>
-                <Button onClick={this.lookUpVoteRecord}  variant="secondary">
+                <Button onClick={this.lookUpVoteRecord}  variant="secondary" disabled={!this.state.lookUpService}>
                         <Icon name='search' /> Search My Voting History
                 </Button>
             </OverlayTrigger>

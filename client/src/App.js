@@ -34,9 +34,9 @@ class App extends Component {
 
     this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
     this.voteForCandidate = this.voteForCandidate.bind(this);
-    this.getMyInfo = this.getMyInfo.bind(this);
 
     this.viewOneCandidateInfo = this.viewOneCandidateInfo.bind(this);
+    this.viewOneVoterInfo = this.viewOneVoterInfo.bind(this);
     this.viewTotalShares = this.viewTotalShares.bind(this);
     this.viewAllocatedShares = this.viewAllocatedShares.bind(this);
     this.viewMaxAllocatShares = this.viewMaxAllocatShares.bind(this);
@@ -167,12 +167,6 @@ class App extends Component {
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
     });
   }
-  
-  // call the voters()
-  async getMyInfo(address){
-    const myInfo = await this.state.deployedVoteContract.methods.voters(address).call();
-    return myInfo;
-  }
 
   async lookUpVoteRecord(){
     this.state.deployedVoteContract.methods.lookUpVoteRecord().send({from: this.state.account});
@@ -205,6 +199,12 @@ class App extends Component {
     return candidate;
   }
 
+    //Can return an item obj containing one voter info
+    async viewOneVoterInfo(address){
+      const voter = await this.state.deployedVoteContract.methods.voters(address).call();
+      return voter;
+    }
+    
   // view amount of total shares
   async viewTotalShares(){
     const totalNumber = await this.state.deployedVoteContract.methods.totalShareNum().call(); 
@@ -335,7 +335,7 @@ class App extends Component {
                         checkVoteSettingDate={this.checkVoteSettingDate} />
                   </Route>
                   <Route path="/myaccount">
-                    <MyAccount getMyInfo={this.getMyInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord} 
+                    <MyAccount viewOneVoterInfo={this.viewOneVoterInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord} 
                                changeMyVote={this.changeMyVote} viewOneCandidateInfo={this.viewOneCandidateInfo}
                                checkVoteDate={this.checkVoteDate} />                  
                   </Route>
