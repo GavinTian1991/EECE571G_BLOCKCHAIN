@@ -13,7 +13,7 @@ export default class ViewCandidates extends Component{
     async componentDidMount(){
         const candidates = await this.props.viewAllCandidate();
         await this.setState({candidates});
-        const voteDateValid = await this.props.checkVoteDate();
+        const voteDateValid = await this.props.checkVoteDate(1);
         await this.setState({voteDateValid});
     }
 

@@ -23,7 +23,7 @@ export default class CreateNewCandidate extends Component{
     this.setState({availableShare});
     const maxShare = await this.props.viewMaxAllocatShares();
     this.setState({maxShare});
-    const voteSettingDateValid = await this.props.checkVoteSettingDate();
+    const voteSettingDateValid = await this.props.checkVoteSettingDate(1);
     this.setState({voteSettingDateValid});
   }
 

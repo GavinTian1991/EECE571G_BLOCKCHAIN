@@ -19,7 +19,7 @@ export default class MyAccount extends Component{
   async componentDidMount(){
     const myInfomation = await this.props.getMyInfo(this.state.account);
     this.setState({myInfo:myInfomation});
-    const voteDateValid = await this.props.checkVoteDate();
+    const voteDateValid = await this.props.checkVoteDate(1);
     this.setState({voteDateValid});
   }
 

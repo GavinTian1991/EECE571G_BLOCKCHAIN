@@ -53,23 +53,23 @@ class App extends Component {
     this.isDeployer = this.isDeployer.bind(this);
   }
 
-  defaultVoteSettingStartDate = new Date(2020,2,1);
-  defaultVoteSettingEndDate = new Date(2021,2,1);
+  defaultVoteSettingStartDate = new Date();
+  defaultVoteSettingEndDate = new Date();
 
-  defaultVoteStartDate = new Date(2020,2,1);
-  defaultVoteEndDate = new Date(2021,2,1);
+  defaultVoteStartDate = new Date();
+  defaultVoteEndDate = new Date();
 
   async componentDidMount(){
-    await this.getWeb3Provider();
-    await this.connectToBlockchain();
-    const voteSettingStartDate = localStorage.getItem("voteSettingStartDate");
-    this.setState({voteSettingStartDate});
-    const voteSettingEndDate = localStorage.getItem("voteSettingEndDate");
-    this.setState({voteSettingEndDate});
-    const voteStartDate = localStorage.getItem("voteStartDate");
-    this.setState({voteStartDate});
-    const voteEndDate = localStorage.getItem("voteEndDate");
-    this.setState({voteEndDate});
+      await this.getWeb3Provider();
+      await this.connectToBlockchain();
+      const voteSettingStartDate = localStorage.getItem("voteSettingStartDate");
+      this.setState({voteSettingStartDate});
+      const voteSettingEndDate = localStorage.getItem("voteSettingEndDate");
+      this.setState({voteSettingEndDate});
+      const voteStartDate = localStorage.getItem("voteStartDate");
+      this.setState({voteStartDate});
+      const voteEndDate = localStorage.getItem("voteEndDate");
+      this.setState({voteEndDate});
   }
   
   async getWeb3Provider(){
@@ -235,51 +235,85 @@ class App extends Component {
     //determine whether current account is deployer
     async isDeployer(){
       const deployer = await this.state.deployedVoteContract.methods.voteDeployer().call();
-      const user = await this.state.account;
-      if(deployer==user){
-        //alert("current user is deployer");
-        return true;
-      }else{
-        //alert("current user is not deployer");
+      const user = this.state.account;
+      if(deployer != user){
         return false;
-      };
+      }
+      return true;
     }
 
     //set date and check if date is valid
-
     setVoteSettingStartDate(voteSettingStartDate){
       this.setState({voteSettingStartDate});
       localStorage.setItem('voteSettingStartDate',voteSettingStartDate);
     }
 
     setVoteSettingEndDate(voteSettingEndDate){
+      if(voteSettingEndDate < this.state.voteSettingStartDate) {
+        alert("Wrong vote setting end date, please reset.");
+        return;
+      }
       this.setState({voteSettingEndDate});
       localStorage.setItem('voteSettingEndDate',voteSettingEndDate);
     }
 
     setVoteStartDate(voteStartDate){
+      if(voteStartDate < this.state.voteSettingEndDate) {
+        alert("Wrong vote start date, please reset.");
+        return;
+      }
       this.setState({voteStartDate});
       localStorage.setItem('voteStartDate',voteStartDate);
     }
 
     setVoteEndDate(voteEndDate){
+      if(voteEndDate < this.state.voteStartDate) {
+        alert("Wrong vote end date, please reset.");
+        return;
+      }
       this.setState({voteEndDate});
       localStorage.setItem('voteEndDate',voteEndDate);
     }
 
-    checkVoteSettingDate(){
-     const now = new Moment();
-     const validDate = now.isAfter(this.state.voteSettingStartDate) && now.isBefore(this.state.voteSettingEndDate);
-     alert("check Vote Setting Date:"+validDate);
+    checkVoteSettingDate(index){
+     const now = new Date();
+     const start = new Date(this.state.voteSettingStartDate);
+     const end = new Date(this.state.voteSettingEndDate);
+     const validDate = this.dateCompare(start, end, now);
+     //const validDate = now.isSameOrAfter(this.state.voteSettingStartDate) && now.isSameOrBefore(this.state.voteSettingEndDate);
+     if(index === 0) {
+       if(validDate) {
+          alert("You can change vote setting today.");
+       } else {
+          alert("Exceed vote setting deadline.");
+       }
+     }
      return validDate;
     }
 
-    checkVoteDate(){
-      const now = new Moment();
-      const validDate = (now.isAfter(this.state.voteStartDate) && now.isBefore(this.state.voteEndDate));
-      alert("check Vote Date:"+validDate);
+    checkVoteDate(index){
+      // const now = new Moment();
+      // const validDate = (now.isSameOrAfter(this.state.voteStartDate) && now.isSameOrBefore(this.state.voteEndDate));
+      const now = new Date();
+      const start = new Date(this.state.voteStartDate);
+      const end = new Date(this.state.voteEndDate);
+      const validDate = this.dateCompare(start, end, now);
+      if(index === 0) {
+        if(validDate) {
+           alert("You can vote today.");
+        } else {
+           alert("Exceed vote deadline.");
+        }
+      }
       return validDate;
-     }
+    }
+
+    dateCompare(startDate, endDate, nowDate) {
+      const year = startDate.getFullYear() <= nowDate.getFullYear() && nowDate.getFullYear() <= endDate.getFullYear();
+      const month = startDate.getMonth() <= nowDate.getMonth() && nowDate.getMonth() <= endDate.getMonth();
+      const day = startDate.getDate() <= nowDate.getDate() && nowDate.getDate() <= endDate.getDate();
+      return year && month && day;
+    }
 
   render() {
     return (

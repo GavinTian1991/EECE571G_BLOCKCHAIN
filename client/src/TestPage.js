@@ -22,14 +22,14 @@ export default class TestPage extends Component{
         this.checkVoteDate =this.checkVoteDate.bind(this);
     }
 
-    async componentDidMount(){
+    async componentDidMount() {
         const maxNominateNum = await this.props.getMaxNominatedNum();
         this.setState({maxNominateNum});
         const voteType = await this.props.getVoteType();
         this.setState({voteType});
         const isDeployer=await this.props.isDeployer();
-        await this.setState({isDeployer});
-        await this.setState({voteSettingStartDate:this.props.voteSettingStartDate,
+        this.setState({isDeployer});
+        this.setState({voteSettingStartDate:this.props.voteSettingStartDate,
             voteSettingEndDate:this.props.voteSettingEndDate,
             voteStartDate:this.props.voteStartDate,
             voteEndDate:this.props.voteEndDate});
@@ -38,29 +38,24 @@ export default class TestPage extends Component{
     onSettingStartChange=(date)=>{
         this.props.setVoteSettingStartDate(date);
         this.setState({dateSettingStart:date});
-        //localStorage.setItem('dateSettingStart',date);
       }
       onSettingEndChange=(date)=>{
           this.props.setVoteSettingEndDate(date);
           this.setState({dateSettingEnd:date});
-          //localStorage.setItem('dateSettingEnd',date);
       }
       onVoteStartChange=(date)=>{
           this.props.setVoteStartDate(date);
           this.setState({dateVoteStart:date});
-          //localStorage.setItem('dateVoteStart',date);
-  
       }
       onVoteEndChange=(date)=>{
           this.props.setVoteEndDate(date);
           this.setState({dateVoteEnd:date});
-          //localStorage.setItem('dateVoteEnd',date);
       }
       checkVoteSettingDate(){
-          this.props.checkVoteSettingDate();
+          this.props.checkVoteSettingDate(0);
       }
       checkVoteDate(){
-          this.props.checkVoteDate();
+          this.props.checkVoteDate(0);
       }
 
     render(){
