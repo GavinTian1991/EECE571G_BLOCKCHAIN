@@ -21,7 +21,7 @@ export default class MyAccount extends Component{
     this.setState({myInfo:myInfomation});
     const voteDateValid = await this.props.checkVoteDate(1);
     this.setState({voteDateValid});
-    if(this.state.myInfo.numOfPeopleNominated == 0) {
+    if(this.state.myInfo.numOfPeopleNominated === 0) {
       this.setState({lookUpService:false});
     }
   }
@@ -105,7 +105,7 @@ export default class MyAccount extends Component{
 						</Table>
           </Card.Body>
           <Card.Footer>
-            <OverlayTrigger trigger="hover" placement="right" overlay={popover}>
+            <OverlayTrigger placement="right" overlay={popover}>
                 <Button onClick={this.lookUpVoteRecord}  variant="secondary" disabled={!this.state.lookUpService}>
                         <Icon name='search' /> Search My Voting History
                 </Button>
@@ -115,9 +115,7 @@ export default class MyAccount extends Component{
         <Card>
         <Form style={{height: '100%'}}  onSubmit={this.submitChangeVote} id="submitChangeVoteFormId">
         <Card.Header><Icon name='plus square' /> Change My Vote</Card.Header>
-      
           <Card.Body>
-         
                     <Form.Row>
                       <Form.Group as={Col} controlId="formGridName">
                         <Form.Label>Record ID</Form.Label>

@@ -68,7 +68,7 @@ export default class TestPage extends Component{
                     Will add briefly instruction here later.
                 </p>
                 <p>
-                    This voting is {this.state.voteType == 1 ? "Straight Voting. " : "Cumulative voting. "}
+                    This voting is {this.state.voteType === 1 ? "Straight Voting. " : "Cumulative voting. "}
                 </p>
                 <p>
                     The number of candidates you can vote to is: {this.state.maxNominateNum}

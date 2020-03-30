@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import Web3 from 'web3';
-import Moment from 'moment';
 import VoteContract from "./contracts/Vote";
 import NavigationBar from './NavigationBar.js';
 import {BrowserRouter as Router,Switch,Route} from 'react-router-dom';
@@ -204,7 +203,7 @@ class App extends Component {
       const voter = await this.state.deployedVoteContract.methods.voters(address).call();
       return voter;
     }
-    
+
   // view amount of total shares
   async viewTotalShares(){
     const totalNumber = await this.state.deployedVoteContract.methods.totalShareNum().call(); 
@@ -236,7 +235,7 @@ class App extends Component {
     async isDeployer(){
       const deployer = await this.state.deployedVoteContract.methods.voteDeployer().call();
       const user = this.state.account;
-      if(deployer != user){
+      if(deployer !== user){
         return false;
       }
       return true;

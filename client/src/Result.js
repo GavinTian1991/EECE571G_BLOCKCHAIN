@@ -7,15 +7,17 @@ export default class Result extends Component{
         super(props);
         this.state = {chartData:[['Candiate Name', 'Total Votes']]};
     }
-
     async componentDidMount(){
         const candidates = await this.props.viewAllCandidate();
-        candidates.map((candidate)=>{
+        for (const candidate of candidates) {
             let info = [candidate.candidateName,candidate.candidateTotalVote];
             this.setState({chartData:[...this.state.chartData,info]});
-        });
+        }
+        // candidates.foreach((candidate)=>{
+        //     let info = [candidate.candidateName,candidate.candidateTotalVote];
+        //     this.setState({chartData:[...this.state.chartData,info]});
+        // });
     }
-    
     render(){
         return(
             <Card>
