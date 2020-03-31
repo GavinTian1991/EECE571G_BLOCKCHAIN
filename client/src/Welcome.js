@@ -41,6 +41,12 @@ export default class Welcome extends Component{
                 <p>
                     5. View vote results under 'Results' tag
                 </p>
+                <h2>
+                    Attention:
+                </h2>
+                <p>
+                    Pay attention to the pop alert window, it will give error or success message related to your operation
+                </p>
 
             </Jumbotron>
         );

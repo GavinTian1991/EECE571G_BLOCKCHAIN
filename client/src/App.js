@@ -185,7 +185,7 @@ class App extends Component {
       await this.contractMessage(eventsName[0]);
       this.setState({loading: false}) // in public blockchain, it may take 10 min to receive the receipt
     }).on('error', async (error) => { 
-      console.log(error)
+      console.log(error);
     });
   }
 
