@@ -6,6 +6,7 @@ import {BrowserRouter as Router,Switch,Route} from 'react-router-dom';
 import CreateNewCandidate from './CreateNewCandidate.js';
 import MyAccount from './MyAccount.js';
 import TestPage from './TestPage.js';
+import Welcome from './Welcome.js';
 import ViewCandidates from './ViewCandidates.js'; 
 import Result from './Result.js';
 import "./App.css";
@@ -27,6 +28,7 @@ class App extends Component {
     this.connectToBlockchain = this.connectToBlockchain.bind(this);
 
     this.createNewCandidate = this.createNewCandidate.bind(this);
+    this.setStartEndDate = this.setStartEndDate.bind(this);
     this.allocateShare = this.allocateShare.bind(this);
     this.changeMyVote = this.changeMyVote.bind(this);
     this.viewAllCandidate = this.viewAllCandidate.bind(this);
@@ -35,6 +37,7 @@ class App extends Component {
     this.voteForCandidate = this.voteForCandidate.bind(this);
 
     this.viewOneCandidateInfo = this.viewOneCandidateInfo.bind(this);
+    this.viewContractDate = this.viewContractDate.bind(this);
     this.viewOneVoterInfo = this.viewOneVoterInfo.bind(this);
     this.viewTotalShares = this.viewTotalShares.bind(this);
     this.viewAllocatedShares = this.viewAllocatedShares.bind(this);
@@ -61,14 +64,23 @@ class App extends Component {
   async componentDidMount(){
       await this.getWeb3Provider();
       await this.connectToBlockchain();
-      const voteSettingStartDate = localStorage.getItem("voteSettingStartDate");
-      this.setState({voteSettingStartDate});
-      const voteSettingEndDate = localStorage.getItem("voteSettingEndDate");
-      this.setState({voteSettingEndDate});
-      const voteStartDate = localStorage.getItem("voteStartDate");
-      this.setState({voteStartDate});
-      const voteEndDate = localStorage.getItem("voteEndDate");
-      this.setState({voteEndDate});
+
+      let tmp = await this.viewContractDate(1);
+      let tmp2 = await this.viewContractDate(2);
+      let tmp3 = await this.viewContractDate(3);
+      let tmp4 = await this.viewContractDate(4);
+
+      const _voteSettingStartDate = new Date(tmp[0], tmp[1], tmp[2]);
+      this.setState({voteSettingStartDate: _voteSettingStartDate});
+
+      const _voteSettingEndDate = new Date(tmp2[0], tmp2[1], tmp2[2]);
+      this.setState({voteSettingEndDate: _voteSettingEndDate});
+
+      const _voteStartDate = new Date(tmp3[0], tmp3[1], tmp3[2]);
+      this.setState({voteStartDate: _voteStartDate});
+
+      const _voteEndDate = new Date(tmp4[0], tmp4[1], tmp4[2]);
+      this.setState({voteEndDate: _voteEndDate});
   }
   
   async getWeb3Provider(){
@@ -125,10 +137,30 @@ class App extends Component {
   //call createNewCandidate(). For now current time is just a constant. Future direction will change to the real current time
   async createNewCandidate(name,photoURL,candidateInfo){
     this.setState ({loading: true});
-    this.state.deployedVoteContract.methods.createNewCandidate(name,photoURL,candidateInfo,150).send({from: this.state.account})
+    this.state.deployedVoteContract.methods.createNewCandidate(name,photoURL,candidateInfo).send({from: this.state.account})
     .once('receipt', async (receipt)=> {
       let eventsName = Object.keys(receipt.events);
       await this.contractMessage(eventsName[0]);
+      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
+    })
+  }
+  
+  reSetAllDateTime = (_date) => {
+    this.setState({voteSettingStartDate: _date});
+    this.setState({voteSettingEndDate: _date});
+    this.setState({voteStartDate: _date});
+    this.setState({voteEndDate: _date});
+  }
+
+  async setStartEndDate(index, year, month, day){
+    if (index == 0) {
+      this.reSetAllDateTime(new Date());
+    }
+    this.setState ({loading: true});
+    this.state.deployedVoteContract.methods.contractDateSetting(index, year, month, day).send({from: this.state.account})
+    .once('receipt', async (receipt)=> {
+      // let eventsName = Object.keys(receipt.events);
+      // await this.contractMessage(eventsName[0]);
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
     })
   }
@@ -148,7 +180,7 @@ class App extends Component {
 
   async voteForCandidate(candidateId,voteNum){
     this.setState ({loading: true})
-    this.state.deployedVoteContract.methods.voteForCandidate(candidateId,voteNum,309).send({from: this.state.account})
+    this.state.deployedVoteContract.methods.voteForCandidate(candidateId,voteNum).send({from: this.state.account})
     .once('receipt', async (receipt)=> {
       let eventsName = Object.keys(receipt.events);
       await this.contractMessage(eventsName[0]);
@@ -159,7 +191,7 @@ class App extends Component {
   // the func below call the solidity func
   async changeMyVote(candidateId,newVote,voteInfoNum){
     this.setState ({loading: true})
-    this.state.deployedVoteContract.methods.changeMyVote(candidateId,newVote,voteInfoNum,309).send({from: this.state.account})
+    this.state.deployedVoteContract.methods.changeMyVote(candidateId,newVote,voteInfoNum).send({from: this.state.account})
     .once('receipt', async (receipt)=> {
       let eventsName = Object.keys(receipt.events);
       await this.contractMessage(eventsName[0]);
@@ -196,6 +228,11 @@ class App extends Component {
   async viewOneCandidateInfo(i){
     const candidate = await this.state.deployedVoteContract.methods.candidates(i).call();
     return candidate;
+  }
+
+  async viewContractDate(i){
+    const contractDate = await this.state.deployedVoteContract.methods.contractDates(i).call();
+    return contractDate;
   }
 
     //Can return an item obj containing one voter info
@@ -242,36 +279,45 @@ class App extends Component {
     }
 
     //set date and check if date is valid
-    setVoteSettingStartDate(voteSettingStartDate){
+    async setVoteSettingStartDate(voteSettingStartDate){
+      await this.setStartEndDate(1, voteSettingStartDate.getFullYear(), 
+      voteSettingStartDate.getMonth(), 
+      voteSettingStartDate.getDate());
       this.setState({voteSettingStartDate});
-      localStorage.setItem('voteSettingStartDate',voteSettingStartDate);
     }
 
-    setVoteSettingEndDate(voteSettingEndDate){
+    async setVoteSettingEndDate(voteSettingEndDate){
       if(voteSettingEndDate < this.state.voteSettingStartDate) {
         alert("Wrong vote setting end date, please reset.");
         return;
       }
+      await this.setStartEndDate(2, voteSettingEndDate.getFullYear(), 
+      voteSettingEndDate.getMonth(), 
+      voteSettingEndDate.getDate());
       this.setState({voteSettingEndDate});
-      localStorage.setItem('voteSettingEndDate',voteSettingEndDate);
     }
 
-    setVoteStartDate(voteStartDate){
+    async setVoteStartDate(voteStartDate){
       if(voteStartDate < this.state.voteSettingEndDate) {
         alert("Wrong vote start date, please reset.");
         return;
       }
+      await this.setStartEndDate(3, voteStartDate.getFullYear(), 
+      voteStartDate.getMonth(), 
+      voteStartDate.getDate());
       this.setState({voteStartDate});
       localStorage.setItem('voteStartDate',voteStartDate);
     }
 
-    setVoteEndDate(voteEndDate){
+    async setVoteEndDate(voteEndDate){
       if(voteEndDate < this.state.voteStartDate) {
         alert("Wrong vote end date, please reset.");
         return;
       }
+      await this.setStartEndDate(4, voteEndDate.getFullYear(), 
+      voteEndDate.getMonth(), 
+      voteEndDate.getDate());
       this.setState({voteEndDate});
-      localStorage.setItem('voteEndDate',voteEndDate);
     }
 
     checkVoteSettingDate(index){
@@ -279,7 +325,6 @@ class App extends Component {
      const start = new Date(this.state.voteSettingStartDate);
      const end = new Date(this.state.voteSettingEndDate);
      const validDate = this.dateCompare(start, end, now);
-     //const validDate = now.isSameOrAfter(this.state.voteSettingStartDate) && now.isSameOrBefore(this.state.voteSettingEndDate);
      if(index === 0) {
        if(validDate) {
           alert("You can change vote setting today.");
@@ -291,8 +336,6 @@ class App extends Component {
     }
 
     checkVoteDate(index){
-      // const now = new Moment();
-      // const validDate = (now.isSameOrAfter(this.state.voteStartDate) && now.isSameOrBefore(this.state.voteEndDate));
       const now = new Date();
       const start = new Date(this.state.voteStartDate);
       const end = new Date(this.state.voteEndDate);
@@ -320,7 +363,7 @@ class App extends Component {
         <NavigationBar/>
       <div style={{margin: '20px'}}>
         <div>
-          <h1>Welcome</h1>
+          <h1>Hello, welcome to D-vote!</h1>
         {"Your Address: " + this.state.account}
         </div>
               { this.state.loading 
@@ -345,21 +388,25 @@ class App extends Component {
                   <Route path="/viewresult">
                     <Result viewAllCandidate={this.viewAllCandidate}/>                  
                   </Route>
+                  <Route path="/voteinfo">
+                    <TestPage getMaxNominatedNum={this.getMaxNominatedNum} 
+                              getVoteType={this.getVoteType} 
+                              setVoteSettingStartDate={this.setVoteSettingStartDate}
+                              setVoteSettingEndDate={this.setVoteSettingEndDate}
+                              setVoteStartDate={this.setVoteStartDate}
+                              setVoteEndDate={this.setVoteEndDate}
+                              checkVoteSettingDate={this.checkVoteSettingDate}
+                              checkVoteDate={this.checkVoteDate}
+                              isDeployer={this.isDeployer}
+                              setStartEndDate={this.setStartEndDate}
+                              voteSettingStartDate={this.state.voteSettingStartDate}
+                              voteSettingEndDate={this.state.voteSettingEndDate}
+                              voteStartDate={this.state.voteStartDate}
+                              voteEndDate={this.state.voteEndDate}
+                    />      
+                  </Route>
                   <Route path="/">
-                  <TestPage getMaxNominatedNum={this.getMaxNominatedNum} 
-                            getVoteType={this.getVoteType} 
-                            setVoteSettingStartDate={this.setVoteSettingStartDate}
-                            setVoteSettingEndDate={this.setVoteSettingEndDate}
-                            setVoteStartDate={this.setVoteStartDate}
-                            setVoteEndDate={this.setVoteEndDate}
-                            checkVoteSettingDate={this.checkVoteSettingDate}
-                            checkVoteDate={this.checkVoteDate}
-                            isDeployer={this.isDeployer}
-                            voteSettingStartDate={this.state.voteSettingStartDate}
-                            voteSettingEndDate={this.state.voteSettingEndDate}
-                            voteStartDate={this.state.voteStartDate}
-                            voteEndDate={this.state.voteEndDate}
-                  />      
+                    <Welcome />
                   </Route>
                 </Switch>
                   }

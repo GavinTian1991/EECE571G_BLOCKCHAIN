@@ -9,14 +9,10 @@ export default class Result extends Component{
     }
     async componentDidMount(){
         const candidates = await this.props.viewAllCandidate();
-        for (const candidate of candidates) {
+        candidates.forEach((candidate)=>{
             let info = [candidate.candidateName,candidate.candidateTotalVote];
             this.setState({chartData:[...this.state.chartData,info]});
-        }
-        // candidates.foreach((candidate)=>{
-        //     let info = [candidate.candidateName,candidate.candidateTotalVote];
-        //     this.setState({chartData:[...this.state.chartData,info]});
-        // });
+        });
     }
     render(){
         return(

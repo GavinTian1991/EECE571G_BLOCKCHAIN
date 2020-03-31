@@ -43,9 +43,9 @@ export default class ViewCandidates extends Component{
                                     </Card.Text>
                                   </Card.Body>
                                 </Card> : 
-                                  this.state.candidates.map((candidate) => {
+                                  this.state.candidates.map((candidate, index) => {
                                     return(
-                                    <Card>
+                                    <Card key={index}>
                                         <Card.Img variant="top" src={candidate.candidatePhoto} />
                                         <Card.Body>
                                          <Card.Title>{candidate.candidateName}</Card.Title>

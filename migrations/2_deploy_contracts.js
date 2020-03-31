@@ -1,7 +1,7 @@
 var Vote = artifacts.require("Vote");
 
 module.exports = function(deployer) {
-  deployer.deploy(Vote,100,200,300,400,5,100,50,1,{gas: 6000000});
+  deployer.deploy(Vote,5,100,50,1,{gas: 6000000});
 };
 // constructor param:
 

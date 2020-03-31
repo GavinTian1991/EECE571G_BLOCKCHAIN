@@ -1,14 +1,13 @@
 pragma solidity >=0.4.21 <0.7.0;
+import "./DateTime.sol";
 
 contract Vote {
     string public voteName;
-    uint256 public addCandidateStartDate;
-    uint256 public addCandidateEndDate;
-    uint256 public voteStartDate;
     uint256 public voteEndDate;
     address public voteDeployer;            // deployer decide who can vote and stock of each Voter
     uint public totalCandidateNumber = 0;   // how many people are in the cadidate map
     uint public maxNominatedNum;                   // how many people can be nominated
+    DateTime dateTime;
     // vote type should be straight voting or cumulative voting
     // 1-> straight voting
     // 2-> cumulative voting
@@ -19,10 +18,12 @@ contract Vote {
     uint public totalShareNum;
     uint public maxShareNum;
     uint public currentTotalShareNum = 0;
+    bool dateInit = false;
     // deployer should confirm when finish deploying the stock
     bool comfirm = false;
     mapping(uint => Candidate) public candidates;
     mapping(address => Voter) public voters;
+    mapping(uint => ContractDate) public contractDates;
     struct Candidate {
         uint candidateId;
         string candidateName;
@@ -44,6 +45,12 @@ contract Vote {
         uint numOfPeopleNominated;  // how many people do I nominate
         mapping (uint => OneVote) myVote; // record for all the nominator I voted
         bool hasVoted;
+    }
+
+    struct ContractDate {
+        uint year;
+        uint month;
+        uint day;
     }
     event allocateShareEvent(
         address voter,
@@ -90,18 +97,15 @@ contract Vote {
 //          Voter Ben has 20 stock thus, he can nominate 3 people, and all these three will have 20 votes
 // 4. if it's cumulative voting, then every voter can have voteNum = stock * maxNominatedNum, and voter can freely distrubute his votes
 
-    constructor(uint256 _addStartDate, uint256 _addEndDate, uint256 _startDate, uint256 _endDate,
-                uint256 _maxNominatedNum, uint256 _totalShareNum, uint256 _maxShareNum, uint _voteType) public {
+    constructor(uint256 _maxNominatedNum, uint256 _totalShareNum, uint256 _maxShareNum, uint _voteType) public {
         voteName = "block chain vote app";
-        addCandidateStartDate = _addStartDate;
-        addCandidateEndDate = _addEndDate;
-        voteStartDate = _startDate;
-        voteEndDate = _endDate;
-        voteType = _voteType;
         maxNominatedNum = _maxNominatedNum;
-        voteDeployer = msg.sender;
         totalShareNum = _totalShareNum;
         maxShareNum = _maxShareNum;
+        voteType = _voteType;
+        voteDeployer = msg.sender;
+        dateTime = new DateTime();
+        //contractDateSetting(0, dateTime.getYear(now), dateTime.getMonth(now), dateTime.getDay(now));
     }
    // this func create a new candidate, only deployer can call this func
    // name and info of candidate must be not null
@@ -110,19 +114,29 @@ contract Vote {
    // 1.let date = (new Date()).getTime();
    // 2.let currentDate = date / 1000;
    // current time should be within the creating new cadidate period
+
+    function contractDateSetting(uint _index, uint _year, uint _month, uint _day) public {
+        if(_index == 0) {
+            for(uint i = 1; i <= 4; i++){
+                contractDates[i] = ContractDate(_year, _month, _day);
+            }
+        } else {
+            dateInit = true;
+            ContractDate memory _contractDate = contractDates[_index];
+            _contractDate.year = _year;
+            _contractDate.month = _month;
+            _contractDate.day = _day;
+            contractDates[_index] = _contractDate;
+        }
+    }
+
     function createNewCandidate(string memory _cadidateName, string memory _candidatePhoto,
-                                string memory _cadidateInfo, uint256 _currentDate) public {
+                                string memory _cadidateInfo) public {
         if(msg.sender != voteDeployer) {
             emit errorMessage("You can't create new cadidate. Only deployer can do this.");
             return;
         }
         require(msg.sender == voteDeployer, "You can't create new cadidate. Only deployer can do this.");
-        if(_currentDate < addCandidateStartDate || _currentDate > addCandidateEndDate) {
-            emit errorMessage("Invalid adding time, no candidate can be added.");
-            return;
-        }
-        require(_currentDate > addCandidateStartDate && _currentDate < addCandidateEndDate,
-                "Invalid adding time, no candidate can be added.");
         require(bytes(_cadidateName).length > 0, "candidate name is required");
         require(bytes(_cadidateInfo).length > 0, "candidate info is required");
         totalCandidateNumber++;
@@ -172,13 +186,7 @@ contract Vote {
     // if voter has stock then he can voteForCandidate
     // if voter still has votes left he can vote
 
-    function voteForCandidate(uint _candidateId, uint _voteNum, uint256 _currentDate) public {
-        if(_currentDate < voteStartDate || _currentDate > voteEndDate) {
-            emit errorMessage("Invalid adding time, no vote can be created.");
-            return;
-        }
-        require(_currentDate > voteStartDate && _currentDate < voteEndDate,
-        "Invalid adding time, no vote can be created.");
+    function voteForCandidate(uint _candidateId, uint _voteNum) public {
         if(_candidateId < 0 || _candidateId > totalCandidateNumber) {
             emit errorMessage("Invalid Candidate Id.");
             return;
@@ -278,13 +286,7 @@ contract Vote {
     // then it will deduct the votes from the previous candidate you vote
     // after that it will add the vote to the new candidate you want to vote
     // this func won't change the numOfPeopleNominated
-    function changeMyVote(uint _candidateId, uint _newVote, uint _voteInfoNum, uint256 _currentDate) public {
-        if(_currentDate < voteStartDate || _currentDate > voteEndDate) {
-            emit errorMessage("Invalid adding time, no vote can be created.");
-            return;
-        }
-        require(_currentDate > voteStartDate && _currentDate < voteEndDate,
-        "Invalid adding time, no vote can be created.");
+    function changeMyVote(uint _candidateId, uint _newVote, uint _voteInfoNum) public {
         if(_candidateId < 0 || _candidateId > totalCandidateNumber) {
             emit errorMessage("Invalid Candidate Id.");
             return;
