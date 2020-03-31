@@ -417,7 +417,8 @@ class App extends Component {
                     />      
                   </Route>
                   <Route path="/">
-                    <Welcome />
+                    <Welcome getMaxNominatedNum={this.getMaxNominatedNum} 
+                             getVoteType={this.getVoteType} />
                   </Route>
                 </Switch>
                   }
