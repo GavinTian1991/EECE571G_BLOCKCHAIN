@@ -76,27 +76,7 @@ export default class TestPage extends Component{
 
     render(){
         return(
-            <Jumbotron>
-                <h1>Group TBD.</h1>
-                <h1>Hello, welcome to D-vote!</h1>
-                <p>
-                    Please read the instruction before voting ^_^ ~
-                    Will add briefly instruction here later.
-                </p>
-                <p>
-                    This voting is {this.state.voteType == 1 ? "Straight Voting. " : "Cumulative voting. "}
-                </p>
-                <p>
-                    The number of candidates you can vote to is: {this.state.maxNominateNum}
-                </p>
-                <p>
-                    You can look up your voting records or change your voting in "My Account" page.
-                </p>
-
-                {/* <p>
-                    Current valid vote setting period: {this.state.voteSettingStartDate.getDate()}
-                </p> */}
-                
+            <Jumbotron>              
                 <p>
                     Current valid vote setting period: {this.state.voteSettingStartDate} ~ {this.state.voteSettingEndDate}
                 </p>
@@ -128,20 +108,22 @@ export default class TestPage extends Component{
                         value={this.state.dateVoteEnd}
                     />
                 </div>
-                </div> : <div></div>
-                }
-                <div style={{margin: '20px'}}>
+                <div>
                     <p>
                         <Button variant="primary" onClick={this.checkVoteSettingDate}>Can I change vote setting today?</Button>
-                    </p>
-                    <p>
-                        <Button variant="primary" onClick={this.checkVoteDate}>Can I vote today?</Button>
                     </p>
                     <p>
                         <Button variant="primary" onClick={this.reSetStartEndDate}>Reset all start and end date.</Button>
                     </p>
                     <p>
                         <Button variant="primary" onClick={this.changeVoteType}>Change vote type.</Button>
+                    </p>
+                </div>
+                </div> : <div></div>
+                }
+                <div style={{margin: '20px'}}>
+                    <p>
+                        <Button variant="primary" onClick={this.checkVoteDate}>Can I vote today?</Button>
                     </p>
                 </div>
             </Jumbotron>
