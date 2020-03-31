@@ -393,7 +393,7 @@ class App extends Component {
                   </Route>
                   <Route path="/gotovote">
                     <ViewCandidates viewAllCandidate={this.viewAllCandidate} voteForCandidate={this.voteForCandidate} 
-                                    checkVoteDate={this.checkVoteDate}/>                  
+                                    checkVoteDate={this.checkVoteDate} getVoteType={this.getVoteType}/>                  
                   </Route>
                   <Route path="/viewresult">
                     <Result viewAllCandidate={this.viewAllCandidate}/>                  

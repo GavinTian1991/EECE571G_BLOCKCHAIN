@@ -129,7 +129,7 @@ export default class TestPage extends Component{
                     />
                 </div>
                 </div> : <div></div>
-                    }
+                }
                 <div style={{margin: '20px'}}>
                     <p>
                         <Button variant="primary" onClick={this.checkVoteSettingDate}>Can I change vote setting today?</Button>
