@@ -18,6 +18,7 @@ class App extends Component {
       totalCandidate: 0,
       candidates: [],
       loading: true,
+      voteType: 1,
       voteSettingStartDate: this.defaultVoteSettingStartDate,
       voteSettingEndDate: this.defaultVoteSettingEndDate,
       voteStartDate: this.defaultVoteStartDate,
@@ -150,6 +151,11 @@ class App extends Component {
     this.setState ({loading: true});
     this.state.deployedVoteContract.methods.changeVoteType().send({from: this.state.account})
     .once('receipt', async (receipt)=> {
+      if(this.state.voteType == 1) {
+        this.setState ({voteType: 2});
+      } else {
+        this.setState ({voteType: 1});
+      }
       let eventsName = Object.keys(receipt.events);
       await this.contractMessage(eventsName[0]);
       this.setState({loading: false});
@@ -373,6 +379,7 @@ class App extends Component {
       <div style={{margin: '20px'}}>
         <div>
           <h1>Hello, welcome to D-vote!</h1>
+          {this.state.voteType == 1 ? <h2>Straight Voting</h2> : <h2>Cumulative Voting</h2>}
         {"Your Address: " + this.state.account}
         </div>
               { this.state.loading 

@@ -148,7 +148,7 @@ export default class MyAccount extends Component{
           </Card.Body>
           
           <Card.Footer>
-          <Button size="sm" variant="success" type="submit" disabled={!this.state.voteDateValid}>
+          <Button size="sm" variant="success" type="submit" disabled={!this.state.voteDateValid || this.state.myInfo.voteChangeNum == 3}>
                   <Icon name='save' /> Confirm
                   </Button>{" "}
           </Card.Footer>
