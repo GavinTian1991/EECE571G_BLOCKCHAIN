@@ -372,7 +372,10 @@ class App extends Component {
     }
 
     dateCompare(startDate, endDate, nowDate) {
-      return startDate <= nowDate <= endDate;      
+      if(startDate <= nowDate && nowDate <= endDate) {
+        return true;
+      }
+      return false; 
     }
 
   render() {

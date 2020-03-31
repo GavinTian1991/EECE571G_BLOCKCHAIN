@@ -45,7 +45,11 @@ export default class MyAccount extends Component{
 
     submitChangeVote = event =>{
         event.preventDefault();
-        this.props.changeMyVote(this.state.candidateId,this.state.newVote,this.state.voteInfoNum);
+        if(this.state.voteType != 1) {
+          this.props.changeMyVote(this.state.candidateId,this.state.newVote,this.state.voteInfoNum);
+        } else {
+            this.props.changeMyVote(this.state.candidateId,5,this.state.voteInfoNum);
+        }
     }
 
  render(){
