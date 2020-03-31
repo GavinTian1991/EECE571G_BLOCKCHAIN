@@ -105,7 +105,7 @@ contract Vote {
         voteType = _voteType;
         voteDeployer = msg.sender;
         dateTime = new DateTime();
-        //contractDateSetting(0, dateTime.getYear(now), dateTime.getMonth(now), dateTime.getDay(now));
+        contractDateSetting(0, dateTime.getYear(now), dateTime.getMonth(now), dateTime.getDay(now));
     }
    // this func create a new candidate, only deployer can call this func
    // name and info of candidate must be not null

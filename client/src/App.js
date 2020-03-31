@@ -321,7 +321,8 @@ class App extends Component {
     }
 
     checkVoteSettingDate(index){
-     const now = new Date();
+     let nowDate = new Date();
+     const now = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
      const start = new Date(this.state.voteSettingStartDate);
      const end = new Date(this.state.voteSettingEndDate);
      const validDate = this.dateCompare(start, end, now);
@@ -332,11 +333,13 @@ class App extends Component {
           alert("Exceed vote setting deadline.");
        }
      }
+     console.log(validDate);
      return validDate;
     }
 
     checkVoteDate(index){
-      const now = new Date();
+      let nowDate = new Date();
+      const now = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
       const start = new Date(this.state.voteStartDate);
       const end = new Date(this.state.voteEndDate);
       const validDate = this.dateCompare(start, end, now);
@@ -351,10 +354,7 @@ class App extends Component {
     }
 
     dateCompare(startDate, endDate, nowDate) {
-      const year = startDate.getFullYear() <= nowDate.getFullYear() && nowDate.getFullYear() <= endDate.getFullYear();
-      const month = startDate.getMonth() <= nowDate.getMonth() && nowDate.getMonth() <= endDate.getMonth();
-      const day = startDate.getDate() <= nowDate.getDate() && nowDate.getDate() <= endDate.getDate();
-      return year && month && day;
+      return startDate <= nowDate <= endDate;      
     }
 
   render() {

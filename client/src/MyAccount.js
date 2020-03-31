@@ -63,12 +63,12 @@ export default class MyAccount extends Component{
         <Card.Header><Icon name='plus square' /> My Basic Info</Card.Header>
           <Card.Body>
           <ListGroup className="list-group-flush">
-                <ListGroupItem>Total Stock: {this.state.myInfo.stock}</ListGroupItem>
+                <ListGroupItem>Total Share: {this.state.myInfo.stock}</ListGroupItem>
                 <ListGroupItem>Total Votes: {this.state.myInfo.totalVoteNum}</ListGroupItem>
                 <ListGroupItem>Votes Used: {this.state.myInfo.voteUsed}</ListGroupItem>
                 <ListGroupItem>Available Votes: {this.state.myInfo.totalVoteNum - this.state.myInfo.voteUsed}</ListGroupItem>
                 <ListGroupItem>Number of Candidates I have voted: {this.state.myInfo.numOfPeopleNominated}</ListGroupItem>
-                <ListGroupItem>Remaining Times to Modify My Vote(MAX 3 times): {3 - this.state.myInfo.voteTime}</ListGroupItem>
+                <ListGroupItem>Remaining Times to Modify My Vote(MAX 3 times): {3 - this.state.myInfo.voteChangeNum}</ListGroupItem>
          </ListGroup>
           </Card.Body>
           <Card.Footer>
@@ -92,13 +92,13 @@ export default class MyAccount extends Component{
 							  <tr align="center">
 					           <td colSpan="4"> 0 record avaliable. </td>
 					          </tr> : 
-                              this.state.record.recordID.map((id) => {
-                                  let newID = parseInt(id)+1;
-                                return(<tr>
-                                <td>{newID}</td>
-                                <td>{this.state.record.candidateID[id]}</td>
-                                <td>{this.state.names[id]}</td>
-                                <td>{this.state.record.voteNum[id]}</td>
+                              this.state.record.recordID.map((id, index) => {
+                                let newID = parseInt(id)+1;
+                                return(<tr key={index}>
+                                  <td>{newID}</td>
+                                  <td>{this.state.record.candidateID[id]}</td>
+                                  <td>{this.state.names[id]}</td>
+                                  <td>{this.state.record.voteNum[id]}</td>
                                </tr>);
                               })}
                       </tbody>
