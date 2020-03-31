@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Chart } from "react-google-charts";
-import {Card} from 'react-bootstrap';
+import { Card } from 'react-bootstrap';
 
 export default class Result extends Component{
     constructor(props){
@@ -10,7 +10,8 @@ export default class Result extends Component{
     async componentDidMount(){
         const candidates = await this.props.viewAllCandidate();
         candidates.forEach((candidate)=>{
-            let info = [candidate.candidateName,candidate.candidateTotalVote];
+            let tmp = parseInt(candidate.candidateTotalVote, 10);
+            let info = [candidate.candidateName, tmp];
             this.setState({chartData:[...this.state.chartData,info]});
         });
     }
@@ -18,18 +19,18 @@ export default class Result extends Component{
         return(
             <Card>
             <Card.Body>
-            <Chart
-                chartType="Bar"
-                loader={<div>Loading Chart</div>}
-                data={this.state.chartData}
-                options={{
-                    // Material design options
-                    chart: {
-                    title: 'Current Voting Result',
-                    subtitle: 'Hover onto the bars to see actual number',
-                    },
-                }}
-                />
+                <Chart
+                    chartType="Bar"
+                    loader={<div>Loading Chart</div>}
+                    data={this.state.chartData}
+                    options={{
+                        // Material design options
+                        chart: {
+                        title: 'Current Voting Result',
+                        subtitle: 'Hover onto the bars to see actual number',
+                        },
+                    }}
+                    />
             </Card.Body>
             </Card>
         );
