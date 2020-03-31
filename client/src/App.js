@@ -83,6 +83,9 @@ class App extends Component {
 
       const _voteEndDate = new Date(tmp4[0], tmp4[1], tmp4[2]);
       this.setState({voteEndDate: _voteEndDate});
+
+      const type = await this.getVoteType();
+      this.setState ({voteType: type});
   }
   
   async getWeb3Provider(){
