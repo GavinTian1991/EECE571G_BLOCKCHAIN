@@ -18,7 +18,6 @@ contract Vote {
     uint public totalShareNum;
     uint public maxShareNum;
     uint public currentTotalShareNum = 0;
-    bool dateInit = false;
     // deployer should confirm when finish deploying the stock
     bool comfirm = false;
     mapping(uint => Candidate) public candidates;
@@ -353,13 +352,13 @@ contract Vote {
                 contractDates[i] = ContractDate(_year, _month, _day);
             }
         } else {
-            dateInit = true;
             ContractDate memory _contractDate = contractDates[_index];
             _contractDate.year = _year;
             _contractDate.month = _month;
             _contractDate.day = _day;
             contractDates[_index] = _contractDate;
         }
+        emit errorMessage("Date Change Finished!");
     }
 
     function changeVoteType() public {

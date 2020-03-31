@@ -179,8 +179,8 @@ class App extends Component {
     this.setState ({loading: true});
     this.state.deployedVoteContract.methods.contractDateSetting(index, year, month, day).send({from: this.state.account})
     .once('receipt', async (receipt)=> {
-      // let eventsName = Object.keys(receipt.events);
-      // await this.contractMessage(eventsName[0]);
+      let eventsName = Object.keys(receipt.events);
+      await this.contractMessage(eventsName[0]);
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
     })
   }
