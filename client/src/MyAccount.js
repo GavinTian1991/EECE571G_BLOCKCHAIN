@@ -21,19 +21,17 @@ export default class MyAccount extends Component{
     this.setState({myInfo:myInfomation});
     const voteDateValid = await this.props.checkVoteDate(1);
     this.setState({voteDateValid});
-    if(this.state.myInfo.numOfPeopleNominated === 0) {
+    if(this.state.myInfo.numOfPeopleNominated == 0) {
       this.setState({lookUpService:false});
     }
   }
 
   async lookUpVoteRecord(){
       const record = await this.props.lookUpVoteRecord();
-      await this.setState({record});
-    //alert("show record in records:\n candidateId:" + record.myAddr + " Votes: "+ record.voteNum[0]);
+      this.setState({record});
     for(let i=0;i<record.candidateID.length;i++){
       const candidate = await this.props.viewOneCandidateInfo(record.candidateID[i]);
       const name = await candidate.candidateName;
-      //alert("set name for id:" + record.candidateID[i] + "name is : " + name);
       this.setState({names:[...this.state.names,name]});
    }
   }

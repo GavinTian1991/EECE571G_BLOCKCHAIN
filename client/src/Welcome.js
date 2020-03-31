@@ -16,15 +16,17 @@ export default class Welcome extends Component{
     render(){
         return(
             <Jumbotron>
-                <h1>Group TBD.</h1>
+                <h2>
+                    General
+                </h2>
                 <p>
-                    This voting is {this.state.voteType == 1 ? "Straight Voting." : "Cumulative Coting."}
+                    This voting is {this.state.voteType == 1 ? "Straight Voting." : "Cumulative Voting."}
                 </p>
                 <p>
-                    The number of candidates you can vote to is: {this.state.maxNominateNum}
+                    The number of candidates you can vote to is {this.state.maxNominateNum}
                 </p>
                 <h2>
-                    Instruction:
+                    Instruction
                 </h2>
                 <p>
                     1. Set vote setting and vote start, end date; change vote type under 'Vote Info' tag with deployer authority
@@ -42,12 +44,19 @@ export default class Welcome extends Component{
                     5. View vote results under 'Results' tag
                 </p>
                 <h2>
-                    Attention:
+                    Attention
                 </h2>
                 <p>
                     Pay attention to the pop alert window, it will give error or success message related to your operation
                 </p>
-
+                <h2>
+                    About
+                </h2>
+                <a href="https://en.wikipedia.org/wiki/Straight-ticket_voting" target="_blank" rel="noopener noreferrer">Straight Voting</a>
+                <p> </p>
+                <a href="https://en.wikipedia.org/wiki/Cumulative_voting" target="_blank" rel="noopener noreferrer">Cumulative Voting</a>
+                <p> </p>
+                <p>Group TBD. Copyright 2020</p>
             </Jumbotron>
         );
     }

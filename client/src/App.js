@@ -178,7 +178,6 @@ class App extends Component {
 
   async allocateShare(address,shareHold){
     this.setState ({loading: true});
-    //alert("gas amount OK, start call fun");
     this.state.deployedVoteContract.methods.allocateShare(address,shareHold).send({from: this.state.account})
     .once('receipt', async (receipt) => {
       let eventsName = Object.keys(receipt.events);
@@ -190,7 +189,7 @@ class App extends Component {
   }
 
   async voteForCandidate(candidateId,voteNum){
-    this.setState ({loading: true})
+    this.setState ({loading: true});
     this.state.deployedVoteContract.methods.voteForCandidate(candidateId,voteNum).send({from: this.state.account})
     .once('receipt', async (receipt)=> {
       let eventsName = Object.keys(receipt.events);
@@ -201,7 +200,7 @@ class App extends Component {
 
   // the func below call the solidity func
   async changeMyVote(candidateId,newVote,voteInfoNum){
-    this.setState ({loading: true})
+    this.setState ({loading: true});
     this.state.deployedVoteContract.methods.changeMyVote(candidateId,newVote,voteInfoNum).send({from: this.state.account})
     .once('receipt', async (receipt)=> {
       let eventsName = Object.keys(receipt.events);
@@ -210,17 +209,17 @@ class App extends Component {
     });
   }
 
-  async lookUpVoteRecord(){
+  async lookUpVoteRecord() {
     this.state.deployedVoteContract.methods.lookUpVoteRecord().send({from: this.state.account});
     let returnResults;
-    await this.state.deployedVoteContract.getPastEvents('lookUpMyVote',{
+    await this.state.deployedVoteContract.getPastEvents('lookUpMyVote', {
           filter: {myAddr: this.state.account}, 
-          fromBlock: 0
+          fromBlock: 'latest'
           }, function(error, events) { 
             }).then(function(events) {
                   returnResults = events[events.length - 1].returnValues;
               });
-        return returnResults;
+      return returnResults;
     }
 
  //call viewAllCandidate(). Can return an array containing item obj
