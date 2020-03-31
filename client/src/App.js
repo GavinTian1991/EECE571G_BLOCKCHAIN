@@ -395,7 +395,7 @@ class App extends Component {
                   <Route path="/myaccount">
                     <MyAccount viewOneVoterInfo={this.viewOneVoterInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord} 
                                changeMyVote={this.changeMyVote} viewOneCandidateInfo={this.viewOneCandidateInfo}
-                               checkVoteDate={this.checkVoteDate} />                  
+                               checkVoteDate={this.checkVoteDate} getVoteType={this.getVoteType}/>                  
                   </Route>
                   <Route path="/gotovote">
                     <ViewCandidates viewAllCandidate={this.viewAllCandidate} voteForCandidate={this.voteForCandidate} 

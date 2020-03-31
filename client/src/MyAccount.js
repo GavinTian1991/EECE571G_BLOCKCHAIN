@@ -6,7 +6,7 @@ export default class MyAccount extends Component{
   constructor(props){
      super(props);
      this.state={account:this.props.account,myInfo:this.initialInfo,record:this.initialRecord,names:[], 
-                 voteDateValid:true, lookUpService: true};
+                 voteDateValid:true, lookUpService: true, voteType: 1};
     
      this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
      this.infoChange = this.infoChange.bind(this);
@@ -21,6 +21,8 @@ export default class MyAccount extends Component{
     this.setState({myInfo:myInfomation});
     const voteDateValid = await this.props.checkVoteDate(1);
     this.setState({voteDateValid});
+    const voteType = await this.props.getVoteType();
+    this.setState({voteType});
     if(this.state.myInfo.numOfPeopleNominated == 0) {
       this.setState({lookUpService:false});
     }
@@ -135,16 +137,18 @@ export default class MyAccount extends Component{
                         className={"bg-light"} placeholder="Enter the new ID of candidate you want to vote now" />
                       </Form.Group>
                     </Form.Row>
-                    <Form.Row>
-                      <Form.Group as={Col} controlId="formGridColor">
-                        <Form.Label>Votes</Form.Label>
-                        <Form.Control autoComplete="off" 
-                        type="text" 
-                        name="newVote"
-                        onChange={this.infoChange}
-                        className={"bg-light"} placeholder="Enter the number of new votes" />
-                      </Form.Group>
-                    </Form.Row>
+                    {this.state.voteType == 1 ? <Form.Row /> :
+                      <Form.Row>
+                        <Form.Group as={Col} controlId="formGridColor">
+                          <Form.Label>Votes</Form.Label>
+                          <Form.Control autoComplete="off" 
+                          type="text" 
+                          name="newVote"
+                          onChange={this.infoChange}
+                          className={"bg-light"} placeholder="Enter the number of new votes" />
+                        </Form.Group>
+                      </Form.Row>
+                    }
           </Card.Body>
           
           <Card.Footer>
