@@ -114,22 +114,6 @@ contract Vote {
    // 1.let date = (new Date()).getTime();
    // 2.let currentDate = date / 1000;
    // current time should be within the creating new cadidate period
-
-    function contractDateSetting(uint _index, uint _year, uint _month, uint _day) public {
-        if(_index == 0) {
-            for(uint i = 1; i <= 4; i++){
-                contractDates[i] = ContractDate(_year, _month, _day);
-            }
-        } else {
-            dateInit = true;
-            ContractDate memory _contractDate = contractDates[_index];
-            _contractDate.year = _year;
-            _contractDate.month = _month;
-            _contractDate.day = _day;
-            contractDates[_index] = _contractDate;
-        }
-    }
-
     function createNewCandidate(string memory _cadidateName, string memory _candidatePhoto,
                                 string memory _cadidateInfo) public {
         if(msg.sender != voteDeployer) {
@@ -363,7 +347,27 @@ contract Vote {
         emit changeVoteRecord(_candidateId, currentVoteNum);
     }
 
-    function changeVoteType(uint _type) public {
-        voteType = _type;
+    function contractDateSetting(uint _index, uint _year, uint _month, uint _day) public {
+        if(_index == 0) {
+            for(uint i = 1; i <= 4; i++){
+                contractDates[i] = ContractDate(_year, _month, _day);
+            }
+        } else {
+            dateInit = true;
+            ContractDate memory _contractDate = contractDates[_index];
+            _contractDate.year = _year;
+            _contractDate.month = _month;
+            _contractDate.day = _day;
+            contractDates[_index] = _contractDate;
+        }
+    }
+
+    function changeVoteType() public {
+        if (voteType == 1) {
+            voteType = 2;
+        } else {
+            voteType = 1;
+        }
+        emit errorMessage("Vote Type Change Finished!");
     }
 }

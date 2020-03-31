@@ -53,6 +53,7 @@ class App extends Component {
     this.checkVoteSettingDate = this.checkVoteSettingDate.bind(this);
     this.checkVoteDate = this.checkVoteDate.bind(this);
     this.isDeployer = this.isDeployer.bind(this);
+    this.changeVoteType = this.changeVoteType.bind(this);
   }
 
   defaultVoteSettingStartDate = new Date();
@@ -142,6 +143,16 @@ class App extends Component {
       let eventsName = Object.keys(receipt.events);
       await this.contractMessage(eventsName[0]);
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
+    })
+  }
+
+  async changeVoteType(){
+    this.setState ({loading: true});
+    this.state.deployedVoteContract.methods.changeVoteType().send({from: this.state.account})
+    .once('receipt', async (receipt)=> {
+      let eventsName = Object.keys(receipt.events);
+      await this.contractMessage(eventsName[0]);
+      this.setState({loading: false});
     })
   }
   
@@ -333,7 +344,6 @@ class App extends Component {
           alert("Exceed vote setting deadline.");
        }
      }
-     console.log(validDate);
      return validDate;
     }
 
@@ -399,6 +409,7 @@ class App extends Component {
                               checkVoteDate={this.checkVoteDate}
                               isDeployer={this.isDeployer}
                               setStartEndDate={this.setStartEndDate}
+                              changeVoteType={this.changeVoteType}
                               voteSettingStartDate={this.state.voteSettingStartDate}
                               voteSettingEndDate={this.state.voteSettingEndDate}
                               voteStartDate={this.state.voteStartDate}

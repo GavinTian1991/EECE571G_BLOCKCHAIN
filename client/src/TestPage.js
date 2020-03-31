@@ -21,6 +21,7 @@ export default class TestPage extends Component{
         this.checkVoteSettingDate = this.checkVoteSettingDate.bind(this);
         this.checkVoteDate =this.checkVoteDate.bind(this);
         this.reSetStartEndDate = this.reSetStartEndDate.bind(this);
+        this.changeVoteType = this.changeVoteType.bind(this);
     }
 
     async componentDidMount() {
@@ -36,11 +37,9 @@ export default class TestPage extends Component{
             voteStartDate: this.dateToString(this.props.voteStartDate),
             voteEndDate: this.dateToString(this.props.voteEndDate)
         });
-        console.log(this.state.voteEndDate);
     }
 
     dateToString=(_date)=>{
-        //console.log(_date);
         return _date.getDate() + "/" +(_date.getMonth() + 1) + "/" + _date.getFullYear();
     }
 
@@ -70,6 +69,9 @@ export default class TestPage extends Component{
         this.props.setStartEndDate(0, new Date().getFullYear(), 
         new Date().getMonth(), 
         new Date().getDate());
+    }
+    changeVoteType() {
+        this.props.changeVoteType();
     }
 
     render(){
@@ -104,40 +106,43 @@ export default class TestPage extends Component{
                 {this.state.isDeployer ? <div style={{margin: '20px'}}>
                     <div> Please select vote setting start date: 
                     <DatePicker
-                    onChange={this.onSettingStartChange}
-                    value={this.state.dateSettingStart}
+                        onChange={this.onSettingStartChange}
+                        value={this.state.dateSettingStart}
                     />
                 </div>
                 <div> Please select vote setting end date: 
                     <DatePicker
-                    onChange={this.onSettingEndChange}
-                    value={this.state.dateSettingEnd}
+                        onChange={this.onSettingEndChange}
+                        value={this.state.dateSettingEnd}
                     />
                 </div>
                 <div> Please select vote start date: 
                     <DatePicker
-                    onChange={this.onVoteStartChange}
-                    value={this.state.dateVoteStart}
+                        onChange={this.onVoteStartChange}
+                        value={this.state.dateVoteStart}
                     />
                 </div>
                 <div>  Please select vote end date: 
                     <DatePicker
-                    onChange={this.onVoteEndChange}
-                    value={this.state.dateVoteEnd}
+                        onChange={this.onVoteEndChange}
+                        value={this.state.dateVoteEnd}
                     />
                 </div>
                 </div> : <div></div>
                     }
                 <div style={{margin: '20px'}}>
-                <p>
-                    <Button variant="primary" onClick={this.reSetStartEndDate}>Reset all start and end date.</Button>
-                </p>
-                <p>
-                    <Button variant="primary" onClick={this.checkVoteSettingDate}>Can I change vote setting today?</Button>
-                </p>
-                <p>
-                    <Button variant="primary" onClick={this.checkVoteDate}>Can I vote today?</Button>
-                </p>
+                    <p>
+                        <Button variant="primary" onClick={this.checkVoteSettingDate}>Can I change vote setting today?</Button>
+                    </p>
+                    <p>
+                        <Button variant="primary" onClick={this.checkVoteDate}>Can I vote today?</Button>
+                    </p>
+                    <p>
+                        <Button variant="primary" onClick={this.reSetStartEndDate}>Reset all start and end date.</Button>
+                    </p>
+                    <p>
+                        <Button variant="primary" onClick={this.changeVoteType}>Change vote type.</Button>
+                    </p>
                 </div>
             </Jumbotron>
         );
