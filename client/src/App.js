@@ -341,9 +341,11 @@ class App extends Component {
 
     checkVoteSettingDate(index){
      let nowDate = new Date();
+     let startDate = this.state.voteSettingStartDate;
+     let endDate = this.state.voteSettingEndDate;
      const now = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
-     const start = new Date(this.state.voteSettingStartDate);
-     const end = new Date(this.state.voteSettingEndDate);
+     const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+     const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
      const validDate = this.dateCompare(start, end, now);
      if(index === 0) {
        if(validDate) {
@@ -357,9 +359,11 @@ class App extends Component {
 
     checkVoteDate(index){
       let nowDate = new Date();
+      let startDate = this.state.voteStartDate;
+      let endDate = this.state.voteEndDate;
       const now = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
-      const start = new Date(this.state.voteStartDate);
-      const end = new Date(this.state.voteEndDate);
+      const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+      const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
       const validDate = this.dateCompare(start, end, now);
       if(index === 0) {
         if(validDate) {
