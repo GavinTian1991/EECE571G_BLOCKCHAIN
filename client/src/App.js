@@ -181,7 +181,7 @@ class App extends Component {
     .once('receipt', async (receipt)=> {
       let eventsName = Object.keys(receipt.events);
       await this.contractMessage(eventsName[0]);
-      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
+      this.setState({loading: false}); 
     })
   }
 
@@ -191,7 +191,7 @@ class App extends Component {
     .once('receipt', async (receipt) => {
       let eventsName = Object.keys(receipt.events);
       await this.contractMessage(eventsName[0]);
-      this.setState({loading: false}) // in public blockchain, it may take 10 min to receive the receipt
+      this.setState({loading: false}) 
     }).on('error', async (error) => { 
       console.log(error);
     });
@@ -203,7 +203,7 @@ class App extends Component {
     .once('receipt', async (receipt)=> {
       let eventsName = Object.keys(receipt.events);
       await this.contractMessage(eventsName[0]);
-      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
+      this.setState({loading: false}); 
     })
   }
 
@@ -214,7 +214,7 @@ class App extends Component {
     .once('receipt', async (receipt)=> {
       let eventsName = Object.keys(receipt.events);
       await this.contractMessage(eventsName[0]);
-      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
+      this.setState({loading: false}); 
     });
   }
 
@@ -237,7 +237,7 @@ class App extends Component {
     let candidates=[];
     candidates.length = totalNumber;
     for (var i = 1;i<= totalNumber;i++) {
-        const candidate = await this.state.deployedVoteContract.methods.candidates(i).call(); // get each items info, item is a mapping(addr => Item)
+        const candidate = await this.state.deployedVoteContract.methods.candidates(i).call(); 
         candidates[i] = candidate; // append the item into the existing item array
     }
     return candidates;
