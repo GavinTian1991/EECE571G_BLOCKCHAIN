@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Card,Form, Button,CardColumns,ListGroup,ListGroupItem,Row,Col} from 'react-bootstrap';
+import {Card,Form, Button,CardColumns,ListGroup,ListGroupItem,Row,Col, CardGroup} from 'react-bootstrap';
 import { Icon } from 'semantic-ui-react';
 
 export default class ViewCandidates extends Component{
@@ -37,7 +37,7 @@ export default class ViewCandidates extends Component{
 
     render(){
         return(
-            <CardColumns>
+            <CardColumns style={{ width: '90rem'}}> 
                 {this.state.candidates.length === 0 ? 
                     <Card style={{ width: '18rem' }}>
                     <Card.Img variant="top" src="https://www.pngitem.com/pimgs/m/80-800194_transparent-users-icon-png-flat-user-icon-png.png" />
@@ -50,15 +50,15 @@ export default class ViewCandidates extends Component{
                 </Card> : 
                     this.state.candidates.map((candidate, index) => {
                     return(
-                    <Card key={index}>
+                    <Card key={index} style={{ width: '30rem' }}>
                         <Card.Img variant="top" src={candidate.candidatePhoto} />
                         <Card.Body>
                             <Card.Title>{candidate.candidateName}</Card.Title>
                             <ListGroup className="list-group-flush">
-                            <ListGroupItem>{candidate.candidateInfo}</ListGroupItem>
-                            <ListGroupItem>Total Votes: {candidate.candidateTotalVote}</ListGroupItem>
-                            <ListGroupItem>Candidate ID: {candidate.candidateId}</ListGroupItem>
-                        </ListGroup>
+                                <ListGroupItem>{candidate.candidateInfo}</ListGroupItem>
+                                <ListGroupItem>Total Votes: {candidate.candidateTotalVote}</ListGroupItem>
+                                <ListGroupItem>Candidate ID: {candidate.candidateId}</ListGroupItem>
+                            </ListGroup>
 
                         <Form onSubmit={this.voteForCandidate(candidate.candidateId)} style={{ margin: '40px' }}>
                         {this.state.voteType != 1 ?
@@ -79,9 +79,9 @@ export default class ViewCandidates extends Component{
                             </Button>
                         </Form>
                         </Card.Body>
-                        <Card.Footer>
+                            <Card.Footer>
 
-                        </Card.Footer>
+                            </Card.Footer>
                         </Card>
                         );
                     })}
