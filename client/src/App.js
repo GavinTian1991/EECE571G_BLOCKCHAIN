@@ -212,6 +212,7 @@ class App extends Component {
     this.setState ({loading: true});
     this.state.deployedVoteContract.methods.changeMyVote(candidateId,newVote,voteInfoNum).send({from: this.state.account})
     .once('receipt', async (receipt)=> {
+      console.log(receipt);
       let eventsName = Object.keys(receipt.events);
       await this.contractMessage(eventsName[0]);
       this.setState({loading: false}); 
