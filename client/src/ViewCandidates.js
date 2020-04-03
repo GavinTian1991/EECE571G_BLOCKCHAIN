@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Card,Form, Button,CardColumns,ListGroup,ListGroupItem,Row,Col, CardGroup} from 'react-bootstrap';
+import {Card,Form, Button,CardColumns,ListGroup,ListGroupItem,Row,Col} from 'react-bootstrap';
 import { Icon } from 'semantic-ui-react';
 
 export default class ViewCandidates extends Component{

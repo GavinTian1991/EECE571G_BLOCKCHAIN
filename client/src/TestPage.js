@@ -76,14 +76,29 @@ export default class TestPage extends Component{
 
     render(){
         return(
-            <Jumbotron>              
+            <Jumbotron>
+                <h2>
+                    General
+                </h2>
+                <p>
+                    This voting is {this.state.voteType == 1 ? "Straight Voting." : "Cumulative Voting."}
+                </p>
+                <p>
+                    The number of candidates you can vote to is {this.state.maxNominateNum}
+                </p>      
+                <h2>
+                    Date period
+                </h2>        
                 <p>
                     Current valid vote setting period: {this.state.voteSettingStartDate} ~ {this.state.voteSettingEndDate}
                 </p>
                 <p>
                     Current valid vote period: {this.state.voteStartDate} ~ {this.state.voteEndDate}
                 </p>
-                {this.state.isDeployer ? <div style={{margin: '20px'}}>
+                {this.state.isDeployer ? <div>
+                    <h2>
+                        Date Setting
+                    </h2>   
                     <div> Please select vote setting start date: 
                     <DatePicker
                         onChange={this.onSettingStartChange}
@@ -108,7 +123,7 @@ export default class TestPage extends Component{
                         value={this.state.dateVoteEnd}
                     />
                 </div>
-                <div>
+                <div style={{marginTop: '15px'}}>
                     <p>
                         <Button variant="primary" onClick={this.checkVoteSettingDate}>Can I change vote setting today?</Button>
                     </p>
@@ -121,7 +136,7 @@ export default class TestPage extends Component{
                 </div>
                 </div> : <div></div>
                 }
-                <div style={{margin: '20px'}}>
+                <div style={{marginTop: '15px'}}>
                     <p>
                         <Button variant="primary" onClick={this.checkVoteDate}>Can I vote today?</Button>
                     </p>

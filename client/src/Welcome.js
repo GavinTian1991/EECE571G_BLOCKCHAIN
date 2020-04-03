@@ -17,15 +17,6 @@ export default class Welcome extends Component{
         return(
             <Jumbotron>
                 <h2>
-                    General
-                </h2>
-                <p>
-                    This voting is {this.state.voteType == 1 ? "Straight Voting." : "Cumulative Voting."}
-                </p>
-                <p>
-                    The number of candidates you can vote to is {this.state.maxNominateNum}
-                </p>
-                <h2>
                     Instruction
                 </h2>
                 <p>
