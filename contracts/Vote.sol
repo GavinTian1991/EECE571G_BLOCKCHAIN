@@ -175,12 +175,6 @@ contract Vote {
             return;
         }
         require(_candidateId > 0 && _candidateId <= totalCandidateNumber, "Invalid Candidate Id.");
-        if (voters[msg.sender].voteChangeNum >= 3) {
-            emit errorMessage("You have access your max voting modifying times(3 times).");
-            return;
-        }
-        require(voters[msg.sender].hasVoted == false || voters[msg.sender].voteChangeNum < 3,
-        "You have access your max voting modifying times(3 times).");
         if(voters[msg.sender].stock <= 0) {
             emit errorMessage("You don't have any share. You can't vote.");
             return;

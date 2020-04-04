@@ -227,7 +227,12 @@ class App extends Component {
           fromBlock: 'latest'
           }, function(error, events) { 
             }).then(function(events) {
-                  returnResults = events[events.length - 1].returnValues;
+                  if(events.length == 0) {
+                    window.alert('Read vote history not successfully, please try again!');
+                    returnResults = 0;
+                  } else {
+                    returnResults = events[events.length - 1].returnValues;
+                  }
               });
       return returnResults;
     }
