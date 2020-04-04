@@ -317,11 +317,7 @@ contract Vote {
         // last candidate I vote
         Candidate memory _lastVoteCandidate = candidates[_voteToModify.candidateId];
          // retrieve the voteNumUsed and the candidate voteNum
-         if(voteType == 1) {
-            _lastVoteCandidate.candidateTotalVote -= _voteToModify.voteNum;
-         } else {
-            _lastVoteCandidate.candidateTotalVote -= _newVote;
-         }
+         _lastVoteCandidate.candidateTotalVote -= _voteToModify.voteNum;
          candidates[_voteToModify.candidateId] = _lastVoteCandidate;
          voters[msg.sender].voteUsed -= _voteToModify.voteNum;
          // now input the new vote info
