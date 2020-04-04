@@ -30,12 +30,14 @@ export default class MyAccount extends Component{
 
   async lookUpVoteRecord(){
       const record = await this.props.lookUpVoteRecord();
-      this.setState({record});
-    for(let i=0;i<record.candidateID.length;i++){
-      const candidate = await this.props.viewOneCandidateInfo(record.candidateID[i]);
-      const name = await candidate.candidateName;
-      this.setState({names:[...this.state.names,name]});
-   }
+      if(record != 0) {
+          this.setState({record});
+          for(let i=0;i<record.candidateID.length;i++){
+            const candidate = await this.props.viewOneCandidateInfo(record.candidateID[i]);
+            const name = await candidate.candidateName;
+            this.setState({names:[...this.state.names,name]});
+      }
+  }
   }
 
   infoChange = event =>{
