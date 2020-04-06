@@ -404,9 +404,9 @@ class App extends Component {
                 : 
                 <Switch>
                   <Route path="/createCandidate">
-                    <CreateNewCandidate createNewCandidate={this.createNewCandidate} allocateShare={this.allocateShare} 
+                    <CreateNewCandidate isDeployer={this.isDeployer} createNewCandidate={this.createNewCandidate} allocateShare={this.allocateShare} 
                         viewTotalShares={this.viewTotalShares} viewAllocatedShares={this.viewAllocatedShares} viewMaxAllocatShares={this.viewMaxAllocatShares} 
-                        checkVoteSettingDate={this.checkVoteSettingDate} />
+                        checkVoteSettingDate={this.checkVoteSettingDate} changeVoteType={this.changeVoteType}/>
                   </Route>
                   <Route path="/myaccount">
                     <MyAccount viewOneVoterInfo={this.viewOneVoterInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord} 

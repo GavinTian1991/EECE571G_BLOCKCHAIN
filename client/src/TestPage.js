@@ -130,9 +130,6 @@ export default class TestPage extends Component{
                     <p>
                         <Button variant="primary" onClick={this.reSetStartEndDate}>Reset all start and end date.</Button>
                     </p>
-                    <p>
-                        <Button variant="primary" onClick={this.changeVoteType}>Change vote type.</Button>
-                    </p>
                 </div>
                 </div> : <div></div>
                 }

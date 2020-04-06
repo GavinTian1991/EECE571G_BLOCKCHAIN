@@ -20,10 +20,10 @@ export default class Welcome extends Component{
                     Instruction
                 </h2>
                 <p>
-                    1. Set vote setting and vote start, end date; change vote type under 'Vote Info' tag with deployer authority
+                    1. Set vote setting and vote start, end date under 'Vote Info' tag with deployer authority
                 </p>
                 <p>
-                    2. Create candidates and allocate voter share under 'Vote Setting' tag with deployer authority
+                    2. Create candidates; allocate voter share and change vote type under 'Vote Setting' tag with deployer authority
                 </p>
                 <p>
                     3. Vote for candidates under 'Vote' tag, select votes number if under vote type 2 Cumulative Voting
