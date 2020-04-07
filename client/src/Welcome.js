@@ -35,12 +35,6 @@ export default class Welcome extends Component{
                     5. View vote results under 'Results' tag
                 </p>
                 <h2>
-                    Attention
-                </h2>
-                <p>
-                    Pay attention to the pop alert window, it will give error or success message related to your operation
-                </p>
-                <h2>
                     About
                 </h2>
                 <a href="https://en.wikipedia.org/wiki/Straight-ticket_voting" target="_blank" rel="noopener noreferrer">Straight Voting</a>

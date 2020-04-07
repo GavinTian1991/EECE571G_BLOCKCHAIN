@@ -394,7 +394,7 @@ class App extends Component {
         <NavigationBar/>
       <div style={{margin: '20px'}}>
         <div>
-          <h1>Hello, welcome to D-vote!</h1>
+          <h1>Hello, Welcome to D-Vote!</h1>
           {this.state.voteType == 1 ? <h2>Straight Voting</h2> : <h2>Cumulative Voting</h2>}
         {"Your Address: " + this.state.account}
         </div>

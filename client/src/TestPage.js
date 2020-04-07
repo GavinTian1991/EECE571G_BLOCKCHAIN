@@ -84,10 +84,10 @@ export default class TestPage extends Component{
                     This voting is {this.state.voteType == 1 ? "Straight Voting." : "Cumulative Voting."}
                 </p>
                 <p>
-                    The number of candidates you can vote to is {this.state.maxNominateNum}
+                    The max number of candidates you can vote to is: {this.state.maxNominateNum}
                 </p>      
                 <h2>
-                    Date period
+                    Date Period
                 </h2>        
                 <p>
                     Current valid vote setting period: {this.state.voteSettingStartDate} ~ {this.state.voteSettingEndDate}

@@ -16,7 +16,7 @@ export default class CreateNewCandidate extends Component{
   }
   
   initialState = {name:'',photoUrl:'',cadidateInfo:'',address:'',amount:'',availableShare:0,
-                  maxShare:0,voteSettingDateValid:true,isDeployer:false};
+                  maxShare:0,voteSettingDateValid:true,isDeployer:true};
 
   async componentDidMount(){
     const totalShare = await this.props.viewTotalShares();
@@ -73,13 +73,13 @@ render(){
          <div>
         <CardDeck>
               <Card>
-                  <Card.Header><Icon name='plus square' /> Split Share</Card.Header>                
+                  <Card.Header><Icon name='plus square' /> Share Allocation</Card.Header>                
                   <Card.Body>
                   <Card.Text>
                     Current Total Available Shares:{this.state.availableShare} 
                   </Card.Text>
                   <Card.Text>
-                    Max Shares You Can Allocate:{this.state.maxShare}
+                    Max Shares You Can Allocate Per Person:{this.state.maxShare}
                   </Card.Text>
                   <Form style={{height: '100%'}} onReset={this.resetProduct} onSubmit={this.submitShare} id="shareFormId">
                       <Form.Row>
@@ -167,7 +167,7 @@ render(){
             </CardDeck>
             <div style={{marginTop: '15px'}}>
               <p>
-                  <Button variant="primary" onClick={this.changeVoteType}>Change vote type.</Button>
+                  <Button variant="primary" onClick={this.changeVoteType} disabled={!this.state.voteSettingDateValid}>Change vote type.</Button>
               </p>
             </div>
         </div> }
