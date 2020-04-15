@@ -1,8 +1,7 @@
 # EECE571G_BLOCKCHAIN_Final_Project
-## Due
-Mar. 23rd, 2020
+
 ## Basic Info
-  Project Name: Vote System
+  Project Name: Global Voting System
   
   Group Name: TBD.
   
@@ -13,10 +12,9 @@ Mar. 23rd, 2020
   2. New workspace in Ganache with truffle-config.js under root
   3. truffle compile
   4. truffle migrate --reset
-  5. (Resolved, do need to do this step)My abi file is placed in default folder(build/contract), otherwise my truffle can't modify the .json file(don't know why). Please copy all the json files into src/contracts after running "migrate"!!! Then the App.js can access the contract abi
-  6. type "npm start" under ./client
-  7. Copy first account key from Ganache and import into metamask with new created account
-  9. Refresh the page
+  5. type "npm start" under ./client
+  6. Copy first account key from Ganache and import into metamask with new created account
+  7. Refresh the page
 ## Features
    This Dapp is for straight voting and cumulative voting on the blockchain.
    
@@ -33,12 +31,15 @@ Mar. 23rd, 2020
    
    Also, it has the following functions:
    
-   1. Insert Candidate Information ** Can only be done by deployer **
-   2. Deploy shares to shareholder  ** Can only be done by deployer **
-   3. Vote for multiple candidate (But you can't exceed the number of open seats, and can't exceed your shares)
-   4. Change the your vote (You have 3 chances to change your vote)
-   5. View your vote
-   6. View the vote of each candidate
+   1. Candidate Creation ** Can only be done by deployer **
+   2. Share Allocation  ** Can only be done by deployer **
+   3. Vote setting & vote start end date  ** Can only be done by deployer **
+   4. Vote type change  ** Can only be done by deployer **
+   5. Vote for multiple candidate (But you can't exceed the number of open seats, and can't exceed your shares)
+   6. View personal vote history
+   7. Change personal vote (maximum 3 times)
+   8. Change the your vote (You have 3 chances to change your vote)
+   9. View real-tim voting results
 
 ## Framework
 ### Back-end
@@ -47,21 +48,5 @@ solidity + truffle + Ganache
 ### Front-end
 react + web3 + bootstrap
 
-Wireframe:
 
-![Image of wireframe](wireframe.jpg)
-
-## TODO
-
-- [ ] Front-end components
-- [ ] truffle test
-- [x] WireFrame
-- [x] Smart contract V1.0
-- [ ] Whitepaper
-
-## Future Development
-
-* Can deploy multiple votings for a company
-* Can deploy different shares of different companies
-* Can deploy multiple votings for different companies
 
