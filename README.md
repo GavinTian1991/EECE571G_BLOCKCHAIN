@@ -20,7 +20,7 @@
    
    What is the difference between straight voting and cumulative voting? -> see here[https://tremblylaw.com/cumulative-and-straight-voting-know-the-difference/]
    
-   key functions:
+   Key functions:
    
    1. Candidate Creation ** Can only be done by deployer **
    2. Share Allocation  ** Can only be done by deployer **
