@@ -30,7 +30,7 @@
    6. View personal vote history
    7. Change personal vote (maximum 3 times)
    8. Change the your vote (You have 3 chances to change your vote)
-   9. View real-tim voting results
+   9. View real-time voting results
 
 ## Framework
 ### Back-end
