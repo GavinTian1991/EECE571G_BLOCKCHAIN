@@ -20,16 +20,7 @@
    
    What is the difference between straight voting and cumulative voting? -> see here[https://tremblylaw.com/cumulative-and-straight-voting-know-the-difference/]
    
-   So this Dapp can let you choose:
-   
-   1. The voting type
-   2. Number of total shares
-   3. Number of open seats
-   4. Max number of shares per voter
-   5. Voting start date and end date
-   6. Open seats info. modifying start date and end date
-   
-   Also, it has the following functions:
+   key functions:
    
    1. Candidate Creation ** Can only be done by deployer **
    2. Share Allocation  ** Can only be done by deployer **
