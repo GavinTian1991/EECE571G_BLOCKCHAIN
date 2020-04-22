@@ -40,4 +40,7 @@ solidity + truffle + Ganache
 react + web3 + bootstrap
 
 
+![image](https://github.com/GavinTian1991/EECE571G_BLOCKCHAIN/raw/master/screenshots/welcome_page.png)
+
+
 
