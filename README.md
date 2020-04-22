@@ -39,8 +39,15 @@ solidity + truffle + Ganache
 ### Front-end
 react + web3 + bootstrap
 
-
+## Pages
+### Main page
 ![image](https://github.com/GavinTian1991/EECE571G_BLOCKCHAIN/raw/master/screenshots/welcome_page.png)
+
+### My account page
+![image](https://github.com/GavinTian1991/EECE571G_BLOCKCHAIN/raw/master/screenshots/my_account_page.png)
+
+### Results page
+![image](https://github.com/GavinTian1991/EECE571G_BLOCKCHAIN/raw/master/screenshots/results_after_votes.png)
 
 
 
