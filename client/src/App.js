@@ -1,27 +1,24 @@
 import React, { Component } from "react";
 import Web3 from 'web3';
-import Moment from 'moment';
 import VoteContract from "./contracts/Vote";
 import NavigationBar from './NavigationBar.js';
 import {BrowserRouter as Router,Switch,Route} from 'react-router-dom';
 import CreateNewCandidate from './CreateNewCandidate.js';
 import MyAccount from './MyAccount.js';
 import TestPage from './TestPage.js';
+import Welcome from './Welcome.js';
 import ViewCandidates from './ViewCandidates.js'; 
 import Result from './Result.js';
 import "./App.css";
-
-
-
 class App extends Component {
   constructor(props){
      super(props);
-     
      this.state = {
       account: '', // the account here is the account in metamask, so this is why we should reload the page after add an account
       totalCandidate: 0,
       candidates: [],
       loading: true,
+      voteType: 1,
       voteSettingStartDate: this.defaultVoteSettingStartDate,
       voteSettingEndDate: this.defaultVoteSettingEndDate,
       voteStartDate: this.defaultVoteStartDate,
@@ -31,23 +28,22 @@ class App extends Component {
     this.getWeb3Provider = this.getWeb3Provider.bind(this);
     this.connectToBlockchain = this.connectToBlockchain.bind(this);
 
-    this.changeMyVote = this.changeMyVote.bind(this);
-
     this.createNewCandidate = this.createNewCandidate.bind(this);
+    this.setStartEndDate = this.setStartEndDate.bind(this);
+    this.allocateShare = this.allocateShare.bind(this);
+    this.changeMyVote = this.changeMyVote.bind(this);
     this.viewAllCandidate = this.viewAllCandidate.bind(this);
 
-
-    this.allocateShare = this.allocateShare.bind(this);
     this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
     this.voteForCandidate = this.voteForCandidate.bind(this);
 
-    this.getMyInfo = this.getMyInfo.bind(this);
-    this.lookUpVoteRecord = this.lookUpVoteRecord.bind(this);
-
     this.viewOneCandidateInfo = this.viewOneCandidateInfo.bind(this);
+    this.viewContractDate = this.viewContractDate.bind(this);
+    this.viewOneVoterInfo = this.viewOneVoterInfo.bind(this);
     this.viewTotalShares = this.viewTotalShares.bind(this);
     this.viewAllocatedShares = this.viewAllocatedShares.bind(this);
     this.viewMaxAllocatShares = this.viewMaxAllocatShares.bind(this);
+
     this.getMaxNominatedNum = this.getMaxNominatedNum.bind(this);
     this.getVoteType = this.getVoteType.bind(this);
 
@@ -58,25 +54,38 @@ class App extends Component {
     this.checkVoteSettingDate = this.checkVoteSettingDate.bind(this);
     this.checkVoteDate = this.checkVoteDate.bind(this);
     this.isDeployer = this.isDeployer.bind(this);
-
+    this.changeVoteType = this.changeVoteType.bind(this);
   }
-  defaultVoteSettingStartDate = new Date(2020,2,1);
-  defaultVoteSettingEndDate = new Date(2021,2,1);
 
-  defaultVoteStartDate = new Date(2020,2,1);
-  defaultVoteEndDate = new Date(2021,2,1);
+  defaultVoteSettingStartDate = new Date();
+  defaultVoteSettingEndDate = new Date();
+
+  defaultVoteStartDate = new Date();
+  defaultVoteEndDate = new Date();
 
   async componentDidMount(){
-    await this.getWeb3Provider();
-    await this.connectToBlockchain();
-    const voteSettingStartDate = localStorage.getItem("voteSettingStartDate");
-    this.setState({voteSettingStartDate});
-    const voteSettingEndDate = localStorage.getItem("voteSettingEndDate");
-    this.setState({voteSettingEndDate});
-    const voteStartDate = localStorage.getItem("voteStartDate");
-    this.setState({voteStartDate});
-    const voteEndDate = localStorage.getItem("voteEndDate");
-    this.setState({voteEndDate});
+      await this.getWeb3Provider();
+      await this.connectToBlockchain();
+
+      let tmp = await this.viewContractDate(1);
+      let tmp2 = await this.viewContractDate(2);
+      let tmp3 = await this.viewContractDate(3);
+      let tmp4 = await this.viewContractDate(4);
+
+      const _voteSettingStartDate = new Date(tmp[0], tmp[1], tmp[2]);
+      this.setState({voteSettingStartDate: _voteSettingStartDate});
+
+      const _voteSettingEndDate = new Date(tmp2[0], tmp2[1], tmp2[2]);
+      this.setState({voteSettingEndDate: _voteSettingEndDate});
+
+      const _voteStartDate = new Date(tmp3[0], tmp3[1], tmp3[2]);
+      this.setState({voteStartDate: _voteStartDate});
+
+      const _voteEndDate = new Date(tmp4[0], tmp4[1], tmp4[2]);
+      this.setState({voteEndDate: _voteEndDate});
+
+      const type = await this.getVoteType();
+      this.setState ({voteType: type});
   }
   
   async getWeb3Provider(){
@@ -103,110 +112,172 @@ class App extends Component {
       this.setState({deployedVoteContract: deployedVoteContract}); // add the contract to state
       this.setState({loading: false})
     } else {
-      window.alert('Ethbay contract is not found in your blockchain.')
+      window.alert('Ethbay contract is not found in your blockchain.');
     }
-  
-  }
-  // the func below call the solidity func
-
-  async changeMyVote(candidateId,newVote,voteInfoNum){
-    this.setState ({loading: true})
-    this.state.deployedVoteContract.methods.changeMyVote(candidateId,newVote,voteInfoNum,309).send({from: this.state.account})
-    .once('receipt', (receipt)=> {
-      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
-    })
-  }
-  
-  // call the voters()
-  async getMyInfo(address){
-    const myInfo = await this.state.deployedVoteContract.methods.voters(address).call();
-    return myInfo;
   }
 
-  //call lookUpVoteRecord()
-  async lookUpVoteRecord(){
-
-    this.state.deployedVoteContract.methods.lookUpVoteRecord().send({from: this.state.account});
-
-    const web3 = window.web3; //first get web3
-    //const currentBlockNum = await web3.eth.getBlockTransactionCount("latest");
-    let returnResults;
-    await this.state.deployedVoteContract.getPastEvents('lookUpMyVote',{
-      filter: {myAddr: this.state.account}, 
-      fromBlock:0
-  }, function(error, events){ 
-    
-    //returnResults = events[events.length-1].returnValues;
-    //console.log(events);
-  }).then(function(events){
-    //alert("current block num: "+currentBlockNum+ "show func return result:" + events[0].returnValues.candidateID[0]);
-    //returnResults = events[0].returnValues;
-    returnResults = events[events.length-1].returnValues;
-    console.log(events.length);
-  });
-
-   return returnResults;
+  //Give window alert based on event type
+  async contractMessage(eventName){
+    await this.state.deployedVoteContract.getPastEvents(eventName,{
+      fromBlock: 'latest'
+      }, function(error, events){ 
+        if(eventName === 'errorMessage'){
+          window.alert(events[0].returnValues.errMsg);
+        }
+        if(eventName === 'allocateShareEvent') {
+          window.alert('Share Allocation Finished!');
+        }
+        if(eventName === 'addCandidate') {
+          window.alert('Add Candidate Finished!');
+        }
+        if(eventName === 'newVoteRecord') {
+          window.alert('Vote Candidate Finished!');
+        }
+        if(eventName === 'changeVoteRecord') {
+          window.alert('Change vote Finished!');
+        }
+    });
   }
 
   //call createNewCandidate(). For now current time is just a constant. Future direction will change to the real current time
   async createNewCandidate(name,photoURL,candidateInfo){
     this.setState ({loading: true});
-
-    this.state.deployedVoteContract.methods.createNewCandidate(name,photoURL,candidateInfo,109).send({from: this.state.account})
-    .once('receipt', (receipt)=> {
+    this.state.deployedVoteContract.methods.createNewCandidate(name,photoURL,candidateInfo).send({from: this.state.account})
+    .once('receipt', async (receipt)=> {
+      let eventsName = Object.keys(receipt.events);
+      await this.contractMessage(eventsName[0]);
       this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
     })
   }
 
- //call viewAllCandidate(). Can return an array containing item obj. return all caniddate info
+  async changeVoteType(){
+    this.setState ({loading: true});
+    this.state.deployedVoteContract.methods.changeVoteType().send({from: this.state.account})
+    .once('receipt', async (receipt)=> {
+      if(this.state.voteType == 1) {
+        this.setState ({voteType: 2});
+      } else {
+        this.setState ({voteType: 1});
+      }
+      let eventsName = Object.keys(receipt.events);
+      await this.contractMessage(eventsName[0]);
+      this.setState({loading: false});
+    })
+  }
+  
+  reSetAllDateTime = (_date) => {
+    this.setState({voteSettingStartDate: _date});
+    this.setState({voteSettingEndDate: _date});
+    this.setState({voteStartDate: _date});
+    this.setState({voteEndDate: _date});
+  }
+
+  async setStartEndDate(index, year, month, day){
+    if (index == 0) {
+      this.reSetAllDateTime(new Date());
+    }
+    this.setState ({loading: true});
+    this.state.deployedVoteContract.methods.contractDateSetting(index, year, month, day).send({from: this.state.account})
+    .once('receipt', async (receipt)=> {
+      let eventsName = Object.keys(receipt.events);
+      await this.contractMessage(eventsName[0]);
+      this.setState({loading: false}); 
+    })
+  }
+
+  async allocateShare(address,shareHold){
+    this.setState ({loading: true});
+    this.state.deployedVoteContract.methods.allocateShare(address,shareHold).send({from: this.state.account})
+    .once('receipt', async (receipt) => {
+      let eventsName = Object.keys(receipt.events);
+      await this.contractMessage(eventsName[0]);
+      this.setState({loading: false}) 
+    }).on('error', async (error) => { 
+      console.log(error);
+    });
+  }
+
+  async voteForCandidate(candidateId,voteNum){
+    this.setState ({loading: true});
+    this.state.deployedVoteContract.methods.voteForCandidate(candidateId,voteNum).send({from: this.state.account})
+    .once('receipt', async (receipt)=> {
+      let eventsName = Object.keys(receipt.events);
+      await this.contractMessage(eventsName[0]);
+      this.setState({loading: false}); 
+    })
+  }
+
+  // the func below call the solidity func
+  async changeMyVote(candidateId,newVote,voteInfoNum){
+    this.setState ({loading: true});
+    this.state.deployedVoteContract.methods.changeMyVote(candidateId,newVote,voteInfoNum).send({from: this.state.account})
+    .once('receipt', async (receipt)=> {
+      console.log(receipt);
+      let eventsName = Object.keys(receipt.events);
+      await this.contractMessage(eventsName[0]);
+      this.setState({loading: false}); 
+    });
+  }
+
+  async lookUpVoteRecord() {
+    this.state.deployedVoteContract.methods.lookUpVoteRecord().send({from: this.state.account});
+    let returnResults;
+    await this.state.deployedVoteContract.getPastEvents('lookUpMyVote', {
+          filter: {myAddr: this.state.account}, 
+          fromBlock: 'latest'
+          }, function(error, events) { 
+            }).then(function(events) {
+                  if(events.length == 0) {
+                    window.alert('Read vote history not successfully, please try again!');
+                    returnResults = 0;
+                  } else {
+                    returnResults = events[events.length - 1].returnValues;
+                  }
+              });
+      return returnResults;
+    }
+
+ //call viewAllCandidate(). Can return an array containing item obj
   async viewAllCandidate(){
     const totalNumber = await this.state.deployedVoteContract.methods.totalCandidateNumber().call(); 
     let candidates=[];
     candidates.length = totalNumber;
     for (var i = 1;i<= totalNumber;i++) {
-        const candidate = await this.state.deployedVoteContract.methods.candidates(i).call(); // get each items info, item is a mapping(addr => Item)
+        const candidate = await this.state.deployedVoteContract.methods.candidates(i).call(); 
         candidates[i] = candidate; // append the item into the existing item array
     }
     return candidates;
   }
 
-   //Can return an item obj containing one candidate info
-   async viewOneCandidateInfo(i){
+  //Can return an item obj containing one candidate info
+  async viewOneCandidateInfo(i){
     const candidate = await this.state.deployedVoteContract.methods.candidates(i).call();
     return candidate;
   }
 
- 
-
-  async allocateShare(address,shareHold){
-    this.setState ({loading: true});
-    alert("gas amount OK, start call fun");
-    this.state.deployedVoteContract.methods.allocateShare(address,shareHold).send({from: this.state.account})
-    .once('receipt', (receipt)=> {
-      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
-    })
+  async viewContractDate(i){
+    const contractDate = await this.state.deployedVoteContract.methods.contractDates(i).call();
+    return contractDate;
   }
 
-  async voteForCandidate(candidateId,voteNum){
-    this.setState ({loading: true})
-    this.state.deployedVoteContract.methods.voteForCandidate(candidateId,voteNum,309).send({from: this.state.account})
-    .once('receipt', (receipt)=> {
-      this.setState({loading: false}); // in public blockchain, it may take 10 min to receive the receipt
-    })
-  }
+    //Can return an item obj containing one voter info
+    async viewOneVoterInfo(address){
+      const voter = await this.state.deployedVoteContract.methods.voters(address).call();
+      return voter;
+    }
 
   // view amount of total shares
   async viewTotalShares(){
     const totalNumber = await this.state.deployedVoteContract.methods.totalShareNum().call(); 
     return totalNumber;
   }
-
+  
     // view amount of total allocated shares
     async viewAllocatedShares(){
       const totalNumber = await this.state.deployedVoteContract.methods.currentTotalShareNum().call(); 
       return totalNumber;
     }
-
+  
     async viewMaxAllocatShares(){
       const totalNumber = await this.state.deployedVoteContract.methods.maxShareNum().call(); 
       return totalNumber;
@@ -225,106 +296,154 @@ class App extends Component {
     //determine whether current account is deployer
     async isDeployer(){
       const deployer = await this.state.deployedVoteContract.methods.voteDeployer().call();
-      const user = await this.state.account;
-      if(deployer==user){
-        //alert("current user is deployer");
-        return true;
-      }else{
-        //alert("current user is not deployer");
+      const user = this.state.account;
+      if(deployer !== user){
         return false;
-      };
+      }
+      return true;
     }
 
     //set date and check if date is valid
-
-    setVoteSettingStartDate(voteSettingStartDate){
+    async setVoteSettingStartDate(voteSettingStartDate){
+      await this.setStartEndDate(1, voteSettingStartDate.getFullYear(), 
+      voteSettingStartDate.getMonth(), 
+      voteSettingStartDate.getDate());
       this.setState({voteSettingStartDate});
-      localStorage.setItem('voteSettingStartDate',voteSettingStartDate);
     }
 
-    setVoteSettingEndDate(voteSettingEndDate){
+    async setVoteSettingEndDate(voteSettingEndDate){
+      if(voteSettingEndDate < this.state.voteSettingStartDate) {
+        alert("Wrong vote setting end date, please reset.");
+        return;
+      }
+      await this.setStartEndDate(2, voteSettingEndDate.getFullYear(), 
+      voteSettingEndDate.getMonth(), 
+      voteSettingEndDate.getDate());
       this.setState({voteSettingEndDate});
-      localStorage.setItem('voteSettingEndDate',voteSettingEndDate);
     }
 
-    setVoteStartDate(voteStartDate){
+    async setVoteStartDate(voteStartDate){
+      if(voteStartDate < this.state.voteSettingEndDate) {
+        alert("Wrong vote start date, please reset.");
+        return;
+      }
+      await this.setStartEndDate(3, voteStartDate.getFullYear(), 
+      voteStartDate.getMonth(), 
+      voteStartDate.getDate());
       this.setState({voteStartDate});
       localStorage.setItem('voteStartDate',voteStartDate);
     }
 
-    setVoteEndDate(voteEndDate){
+    async setVoteEndDate(voteEndDate){
+      if(voteEndDate < this.state.voteStartDate) {
+        alert("Wrong vote end date, please reset.");
+        return;
+      }
+      await this.setStartEndDate(4, voteEndDate.getFullYear(), 
+      voteEndDate.getMonth(), 
+      voteEndDate.getDate());
       this.setState({voteEndDate});
-      localStorage.setItem('voteEndDate',voteEndDate);
     }
 
-    checkVoteSettingDate(){
-     const now = new Moment();
-     const validDate = now.isAfter(this.state.voteSettingStartDate) && now.isBefore(this.state.voteSettingEndDate);
-     alert("check Vote Setting Date:"+validDate);
+    checkVoteSettingDate(index){
+     let nowDate = new Date();
+     let startDate = this.state.voteSettingStartDate;
+     let endDate = this.state.voteSettingEndDate;
+     const now = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
+     const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+     const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+     const validDate = this.dateCompare(start, end, now);
+     if(index === 0) {
+       if(validDate) {
+          alert("You can change vote setting today.");
+       } else {
+          alert("Exceed vote setting deadline.");
+       }
+     }
      return validDate;
     }
 
-    checkVoteDate(){
-      const now = new Moment();
-      const validDate = (now.isAfter(this.state.voteStartDate) && now.isBefore(this.state.voteEndDate));
-      alert("check Vote Date:"+validDate);
+    checkVoteDate(index){
+      let nowDate = new Date();
+      let startDate = this.state.voteStartDate;
+      let endDate = this.state.voteEndDate;
+      const now = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
+      const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+      const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+      const validDate = this.dateCompare(start, end, now);
+      if(index === 0) {
+        if(validDate) {
+           alert("You can vote today.");
+        } else {
+           alert("Exceed vote deadline.");
+        }
+      }
       return validDate;
-     }
+    }
 
+    dateCompare(startDate, endDate, nowDate) {
+      if(startDate <= nowDate && nowDate <= endDate) {
+        return true;
+      }
+      return false; 
+    }
 
-
- 
-  
   render() {
     return (
       <Router>
         <NavigationBar/>
       <div style={{margin: '20px'}}>
         <div>
-          <h1>Welcome</h1>
+          <h1>Hello, Welcome to D-Vote!</h1>
+          {this.state.voteType == 1 ? <h2>Straight Voting</h2> : <h2>Cumulative Voting</h2>}
         {"Your Address: " + this.state.account}
-        
         </div>
-        
-          
-            
               { this.state.loading 
                 ? 
                   <div><p className="text-center">Loading ...</p></div> 
                 : 
                 <Switch>
                   <Route path="/createCandidate">
-                    <CreateNewCandidate createNewCandidate={this.createNewCandidate} allocateShare={this.allocateShare} viewTotalShares={this.viewTotalShares} viewAllocatedShares={this.viewAllocatedShares} viewMaxAllocatShares={this.viewMaxAllocatShares} checkVoteSettingDate={this.checkVoteSettingDate}/>
+                    <CreateNewCandidate isDeployer={this.isDeployer} createNewCandidate={this.createNewCandidate} allocateShare={this.allocateShare} 
+                        viewTotalShares={this.viewTotalShares} viewAllocatedShares={this.viewAllocatedShares} viewMaxAllocatShares={this.viewMaxAllocatShares} 
+                        checkVoteSettingDate={this.checkVoteSettingDate} changeVoteType={this.changeVoteType}/>
                   </Route>
                   <Route path="/myaccount">
-                    <MyAccount getMyInfo={this.getMyInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord} changeMyVote={this.changeMyVote} viewOneCandidateInfo={this.viewOneCandidateInfo} checkVoteDate={this.checkVoteDate}/>                  
+                    <MyAccount viewOneVoterInfo={this.viewOneVoterInfo} account={this.state.account} lookUpVoteRecord={this.lookUpVoteRecord} 
+                               changeMyVote={this.changeMyVote} viewOneCandidateInfo={this.viewOneCandidateInfo}
+                               checkVoteDate={this.checkVoteDate} getVoteType={this.getVoteType}/>                  
                   </Route>
                   <Route path="/gotovote">
-                    <ViewCandidates viewAllCandidate={this.viewAllCandidate} voteForCandidate={this.voteForCandidate} checkVoteDate={this.checkVoteDate}/>                  
+                    <ViewCandidates viewAllCandidate={this.viewAllCandidate} voteForCandidate={this.voteForCandidate} 
+                                    checkVoteDate={this.checkVoteDate} getVoteType={this.getVoteType}/>                  
                   </Route>
                   <Route path="/viewresult">
                     <Result viewAllCandidate={this.viewAllCandidate}/>                  
                   </Route>
+                  <Route path="/voteinfo">
+                    <TestPage getMaxNominatedNum={this.getMaxNominatedNum} 
+                              getVoteType={this.getVoteType} 
+                              setVoteSettingStartDate={this.setVoteSettingStartDate}
+                              setVoteSettingEndDate={this.setVoteSettingEndDate}
+                              setVoteStartDate={this.setVoteStartDate}
+                              setVoteEndDate={this.setVoteEndDate}
+                              checkVoteSettingDate={this.checkVoteSettingDate}
+                              checkVoteDate={this.checkVoteDate}
+                              isDeployer={this.isDeployer}
+                              setStartEndDate={this.setStartEndDate}
+                              changeVoteType={this.changeVoteType}
+                              voteSettingStartDate={this.state.voteSettingStartDate}
+                              voteSettingEndDate={this.state.voteSettingEndDate}
+                              voteStartDate={this.state.voteStartDate}
+                              voteEndDate={this.state.voteEndDate}
+                    />      
+                  </Route>
                   <Route path="/">
-                  <TestPage getMaxNominatedNum={this.getMaxNominatedNum} 
-                  getVoteType={this.getVoteType} 
-                  setVoteSettingStartDate={this.setVoteSettingStartDate}
-                  setVoteSettingEndDate={this.setVoteSettingEndDate}
-                  setVoteStartDate={this.setVoteStartDate}
-                  setVoteEndDate={this.setVoteEndDate}
-                  checkVoteSettingDate={this.checkVoteSettingDate}
-                  checkVoteDate={this.checkVoteDate}
-                  isDeployer={this.isDeployer}
-                  voteSettingStartDate={this.state.voteSettingStartDate}
-                  voteSettingEndDate={this.state.voteSettingEndDate}
-                  voteStartDate={this.state.voteStartDate}
-                  voteEndDate={this.state.voteEndDate}/>   
+                    <Welcome getMaxNominatedNum={this.getMaxNominatedNum} 
+                             getVoteType={this.getVoteType} />
                   </Route>
                 </Switch>
                   }
-            
-          
-        
       </div>
       </Router>
     );

@@ -6,13 +6,12 @@ class NavigationBar extends React.Component{
 		return (
 				<Navbar bg="dark" variant="dark">
 				<Link to={"/"} className="navbar-brand">D-Vote</Link>
-				
 				<Nav className="mr-auto">
-			      <Link to={"/"} className="nav-link">Vote Info</Link>
-			      <Link to={"/gotovote"} className="nav-link">Vote</Link>
+			      <Link to={"/voteinfo"} className="nav-link">Vote Info</Link>
+				  <Link to={"/createCandidate"} className="nav-link">Vote Setting</Link>
+				  <Link to={"/myaccount"} className="nav-link">My Account</Link>
+				  <Link to={"/gotovote"} className="nav-link">Vote</Link>
                   <Link to={"/viewresult"} className="nav-link">Results</Link>
-                  <Link to={"/myaccount"} className="nav-link">My account</Link>
-                  <Link to={"/createCandidate"} className="nav-link">Vote Setting</Link>
 			    </Nav>
 				</Navbar>
          );
